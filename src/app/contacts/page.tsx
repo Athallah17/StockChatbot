@@ -1,32 +1,45 @@
 'use client'
-import { useEffect, useState } from 'react';
-import { Layout } from "antd";
+import { useState } from 'react';
+import { Layout, Input, Button } from 'antd';
 
 const { Content } = Layout;
 
-const Contacts = () => {
-    interface DataType {
-        message: string;
-    }
+const MarketData = () => {
+    const [ticker, setTicker] = useState('');
+    const [data, setData] = useState(null);
 
-    const [data, setData] = useState<DataType | null>(null);
-
-    useEffect(() => {
-        fetch('http://localhost:8000/example')
-            .then(response => response.json())
-            .then(data => setData(data))
-            .catch(error => console.error('Error fetching data:', error));
-    }, []);
+    const fetchMarketData = async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/marketdata?ticker=${ticker}`);
+            const result = await response.json();
+            setData(result);
+        } catch (error) {
+            console.error('Error fetching market data:', error);
+        }
+    };
 
     return (
         <Layout className="flex flex-col h-screen">
-            <Content className="flex-grow flex justify-center items-center">
-                <div className="text-3xl text-black font-bold">
-                    {data ? data.message : "Loading..."}
+            <Content className="flex-grow flex flex-col justify-center items-center">
+                <Input
+                    placeholder="Enter ticker symbol"
+                    value={ticker}
+                    onChange={(e) => setTicker(e.target.value)}
+                    style={{ width: 200, marginBottom: 20 }}
+                />
+                <Button type="primary" onClick={fetchMarketData}>
+                    Fetch Market Data
+                </Button>
+                <div className="mt-10">
+                    {data ? (
+                        <pre>{JSON.stringify(data, null, 2)}</pre>
+                    ) : (
+                        <p>No data available</p>
+                    )}
                 </div>
             </Content>
         </Layout>
-    )
-}
+    );
+};
 
-export default Contacts;
+export default MarketData;
