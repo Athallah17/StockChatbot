@@ -11,16 +11,25 @@ const MarketData = () => {
     const [periode, setPeriod] = useState('1d');
     const [data, setData] = useState(null);
 
-    const handleFetchMarketData = async () => {
+    const handleFetchMarketData = async (fullData = false) => {
         try {
-            const result = await fetchMarketData(ticker, periode);
+            const result = await fetchMarketData(ticker, periode, fullData);
             setData(result);
         } catch (error) {
             console.error('Error fetching market data:', error);
         }
     };
 
-    const columns = [
+    const handleFetchFundamentalData = async () => {
+        try {
+            const result = await fetchMarketData(ticker, '1d', false);
+            setData(result);
+        } catch (error) {
+            console.error('Error fetching fundamental data:', error);
+        }
+    };
+
+    const historicalColumns = [
         {
             title: 'Date',
             dataIndex: 'Date',
@@ -53,6 +62,27 @@ const MarketData = () => {
         },
     ];
 
+    const fundamentalColumns = [
+        {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+        },
+        {
+            title: 'Value',
+            dataIndex: 'value',
+            key: 'value',
+        },
+    ];
+
+    const fundamentalData = data
+        ? Object.entries(data).map(([key, value]) => ({
+              key,
+              title: key,
+              value: value !== null ? value.toString() : 'N/A',
+          }))
+        : [];
+
     return (
         <Layout className="flex flex-col h-screen">
             <Content className="flex-grow flex flex-col justify-center items-center">
@@ -79,17 +109,36 @@ const MarketData = () => {
                     <Option value="ytd">Year to Date</Option>
                     <Option value="max">Max</Option>
                 </Select>
-                <Button type="primary" onClick={handleFetchMarketData}>
-                    Fetch Market Data
-                </Button>
+                <div className="space-y-2">
+                    <Button type="primary" onClick={() => handleFetchMarketData(false)}>
+                        Fetch Period Data
+                    </Button>
+                    <Button type="primary" onClick={() => handleFetchMarketData(true)} style={{ marginLeft: 10 }}>
+                        Fetch Period Historical Data
+                    </Button>
+                    <Button type="primary" onClick={handleFetchFundamentalData} style={{ marginLeft: 10 }}>
+                        Fetch Fundamental Data
+                    </Button>
+                </div>
                 <div className="mt-10" style={{ width: '80%' }}>
                     {data ? (
-                        <Table
-                            columns={columns}
-                            dataSource={data.map((item, index) => ({ ...item, key: index }))}
-                            pagination={false}
-                            scroll={{ y: 240 }}
-                        />
+                        <>
+                            <Table
+                                columns={fundamentalColumns}
+                                dataSource={fundamentalData}
+                                pagination={false}
+                                scroll={{ y: 240 }}
+                            />
+                            {data.historical_data && (
+                                <Table
+                                    columns={historicalColumns}
+                                    dataSource={data.historical_data.map((item, index) => ({ ...item, key: index }))}
+                                    pagination={false}
+                                    scroll={{ y: 240 }}
+                                    style={{ marginTop: 20 }}
+                                />
+                            )}
+                        </>
                     ) : (
                         <p>No data available</p>
                     )}
