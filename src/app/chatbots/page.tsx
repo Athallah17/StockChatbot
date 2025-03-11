@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Layout, Input, Button, message as antdMessage } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
-import OpenAI from 'openai';
+import {getAnswer, getPredictions} from '@/utils/api';
+
 
 const { Content, Sider, Header } = Layout;
 const { TextArea } = Input;
@@ -13,29 +14,14 @@ const Chatbots = () => {
     ]);
     const [input, setInput] = useState('');
 
-    // Get the OpenAI API key from environment variables
-    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
-    if (!apiKey) {
-        console.error('OpenAI API key is missing');
-        return null;
-    }
-
-    // Initialize OpenAI API client
-    const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-
     const handleSend = async () => {
         if (input.trim()) {
             setMessages([...messages, { sender: 'user', text: input }]);
             setInput('');
 
             try {
-                const response = await openai.chat.completions.create({
-                    model: 'gpt-3.5-turbo',
-                    messages: [{ role: 'user', content: input }],
-                });
-
-                const botMessage = response.choices[0].message?.content || 'No response';
+                const response = await getAnswer(input);
+                const botMessage = response.choices?.[0]?.message?.content || 'No response';
                 setMessages((prev) => [...prev, { sender: 'bot', text: botMessage }]);
             } catch (error) {
                 console.error('OpenAI API Error:', error);
