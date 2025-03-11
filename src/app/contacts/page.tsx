@@ -110,9 +110,6 @@ const MarketData = () => {
                     <Option value="max">Max</Option>
                 </Select>
                 <div className="space-y-2">
-                    <Button type="primary" onClick={() => handleFetchMarketData(false)}>
-                        Fetch Period Data
-                    </Button>
                     <Button type="primary" onClick={() => handleFetchMarketData(true)} style={{ marginLeft: 10 }}>
                         Fetch Period Historical Data
                     </Button>
