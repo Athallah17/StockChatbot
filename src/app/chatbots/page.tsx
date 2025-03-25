@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Markdown from 'react-markdown';
 import { Layout, Input, Button, message as antdMessage } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import {getAnswer, getPredictions} from '@/utils/api';
@@ -51,7 +52,7 @@ const Chatbots = () => {
                                         : 'bg-gray-200'
                                 } rounded-lg`}
                             >
-                                {msg.text}
+                                <Markdown>{msg.text}</Markdown>
                             </div>
                         ))}
                     </div>
