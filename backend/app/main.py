@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import example, fetchdata
+from .routes import fetchdata, agents, market
 
 app = FastAPI()
 
@@ -13,8 +13,10 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.include_router(example.router)
 app.include_router(fetchdata.router)
+app.include_router(agents.router)
+app.include_router(market.router)
+
 
 @app.get("/")
 def read_root():
