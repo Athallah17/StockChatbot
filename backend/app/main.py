@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import fetchdata, agents, market
+from .routes import fetchdata, agents, market, analyzer
 
 app = FastAPI()
 
@@ -16,6 +16,7 @@ app.add_middleware(
 app.include_router(fetchdata.router)
 app.include_router(agents.router)
 app.include_router(market.router)
+app.include_router(analyzer.router)
 
 
 @app.get("/")
