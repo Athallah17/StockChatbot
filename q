@@ -1,4 +1,16 @@
-[33mcommit d505bb673bc256b909ee253ffbf67b9179ccd352[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32magent[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+[33mcommit 1f0695b1d36e0e0713f3453112f34cb5cd33d552[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32magents[m[33m, [m[1;31morigin/agents[m[33m)[m
+Author: AthallahK <Athallahyaristyan@gmail.com>
+Date:   Sat Apr 5 22:21:33 2025 +0700
+
+    Add Analyzer Agent
+
+[33mcommit 234660e4ffb24f36131e5995980378d96fc829b7[m
+Author: AthallahK <Athallahyaristyan@gmail.com>
+Date:   Fri Apr 4 21:10:04 2025 +0700
+
+    Add AI Agents (Market_Agents)
+
+[33mcommit d505bb673bc256b909ee253ffbf67b9179ccd352[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mlist[m[33m, [m[1;32magent[m[33m)[m
 Author: AthallahK <Athallahyaristyan@gmail.com>
 Date:   Tue Mar 25 15:28:50 2025 +0700
 
