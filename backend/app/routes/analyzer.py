@@ -15,39 +15,32 @@ class AnalysisRequest(BaseModel):
 # === Route: Basic Analysis (Trend + Growth)
 @router.post("/analyzer/trend")
 async def basic_analysis(request: AnalysisRequest):
-    """
-    Run basic trend and growth analysis from tickers (fetches data inside the agent).
-    """
-    result = analyzer_agent.analyze(
-        tickers=request.tickers,
-        period=request.period,
-        interval=request.interval
-    )
     return {
-        "analysis": result
+        "analysis": await analyzer_agent.analyze(
+            tickers=request.tickers,
+            period=request.period,
+            interval=request.interval
+        )
     }
 
 # === Route: Full Statistical Analysis (Optional)
 @router.post("/analyzer/full")
 async def full_analysis(request: AnalysisRequest):
-    """
-    Run full statistical analysis using analyze_from_data (volatility, avg, etc).
-    """
     historical_data = analyzer_agent.get_market_data(
         tickers=request.tickers,
         period=request.period,
         interval=request.interval
     )
-    support_resistance = analyzer_agent.analyze_support_resistance(
+    detailed = await analyzer_agent.analyze_from_data(historical_data)
+    support = await analyzer_agent.analyze_support_resistance(
         tickers=request.tickers,
         period=request.period,
         interval=request.interval
     )
-    result = analyzer_agent.analyze_from_data(historical_data)
 
     return {
         "analysis": {
-            "detailed": result,
-            "support_resistance": support_resistance
+            "detailed": detailed,
+            "support_resistance": support
         }
     }

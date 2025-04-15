@@ -1,6 +1,7 @@
 import yfinance as yf
 from crewai import Agent
 from typing import List, Dict, Any
+from app.utils.summarizer import generate_summary
 
 class MarketAgent:
     def __init__(self):
@@ -12,28 +13,48 @@ class MarketAgent:
             memory=False
         )
 
-    def get_market_data(self, tickers: List[str], period: str = "1mo", interval: str = "1d") -> Dict[str, Any]:
+    async def get_market_data(self, tickers: List[str], period: str = "1mo", interval: str = "1d") -> Dict[str, Any]:
         data = {}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
                 hist = stock.history(period=period, interval=interval)
-                data[ticker] = hist.reset_index().to_dict(orient="records")
+                records = hist.reset_index().to_dict(orient="records")
+
+                # 🧠 LLM summary
+                prompt = f"Summarize the historical market data of {ticker} for the last {period}: {records[-5:]}"  # last 5 days
+                summary = await generate_summary(prompt)
+
+                data[ticker] = {
+                    "raw": records,
+                    "summary": summary
+                }
             except Exception as e:
-                data[ticker] = f"Error fetching history: {str(e)}"
+                data[ticker] = { "error": str(e) }
         return data
 
-    def get_live_price(self, tickers: List[str]) -> Dict[str, Any]:
+    async def get_live_price(self, tickers: List[str]) -> Dict[str, Any]:
         prices = {}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
-                prices[ticker] = stock.info.get("regularMarketPrice", "N/A")
+                price = stock.info.get("regularMarketPrice", "N/A")
+
+                prompt = f"What is the current market price of {ticker}? It is {price}."
+                summary = await generate_summary(prompt)
+
+                prices[ticker] = {
+                    "price": price,
+                    "summary": summary
+                }
+
             except Exception as e:
-                prices[ticker] = f"Error fetching price: {str(e)}"
+                prices[ticker] = { "error": str(e) }
+
         return prices
 
-    def get_financials(self, tickers: List[str]) -> Dict[str, Any]:
+
+    async def get_financials(self, tickers: List[str]) -> Dict[str, Any]:
         financial_data = {}
         for ticker in tickers:
             try:
@@ -43,42 +64,55 @@ class MarketAgent:
                 eps = info.get("trailingEps")
                 cap = info.get("marketCap")
 
-                financial_data[ticker] = {
-                    "summary": f"{ticker} has a P/E ratio of {pe}, EPS of {eps}, and market cap of {cap}.",
+                raw = {
                     "PE_ratio": pe,
                     "EPS": eps,
                     "market_cap": cap
                 }
+
+                prompt = f"Summarize the financial condition of {ticker} with these values: {raw}"
+                summary = await generate_summary(prompt)
+
+                financial_data[ticker] = {
+                    "raw": raw,
+                    "summary": summary
+                }
+
             except Exception as e:
-                financial_data[ticker] = f"Error fetching financials: {str(e)}"
+                financial_data[ticker] = { "error": str(e) }
         return financial_data
 
-    def get_sector_industry(self, tickers: List[str]) -> Dict[str, Any]:
+    async def get_sector_industry(self, tickers: List[str]) -> Dict[str, Any]:
         sector_data = {}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
                 info = stock.info
-                sector_data[ticker] = {
-                    "summary": f"{ticker} operates in the {info.get('sector')} sector, under {info.get('industry')} industry.",
+                raw = {
                     "sector": info.get("sector"),
                     "industry": info.get("industry")
                 }
-            except Exception as e:
-                sector_data[ticker] = f"Error fetching sector info: {str(e)}"
-        return sector_data
 
-    def get_dividends_and_earnings(self, tickers: List[str]) -> Dict[str, Any]:
+                prompt = f"Explain the sector and industry of {ticker}: {raw}"
+                summary = await generate_summary(prompt)
+
+                sector_data[ticker] = {
+                    "raw": raw,
+                    "summary": summary
+                }
+
+            except Exception as e:
+                sector_data[ticker] = { "error": str(e) }
+        return sector_data
+    async def get_dividends_and_earnings(self, tickers: List[str]) -> Dict[str, Any]:
         dividend_data = {}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
 
-                # Dividends
                 dividends_df = stock.dividends
                 dividends = dividends_df.reset_index().to_dict(orient="records") if not dividends_df.empty else []
 
-                # Earnings calendar
                 calendar = stock.calendar
                 if hasattr(calendar, "T"):
                     earnings = calendar.T.to_dict().get("Value", {})
@@ -87,10 +121,19 @@ class MarketAgent:
                 else:
                     earnings = {}
 
-                dividend_data[ticker] = {
-                    "dividends": dividends,
+                raw = {
+                    "dividends": dividends[-5:],  # show only last 5
                     "earnings_dates": earnings
                 }
+
+                prompt = f"Summarize recent dividend and earnings info for {ticker}: {raw}"
+                summary = await generate_summary(prompt)
+
+                dividend_data[ticker] = {
+                    "raw": raw,
+                    "summary": summary
+                }
+
             except Exception as e:
-                dividend_data[ticker] = f"Error fetching dividend/earnings: {str(e)}"
+                dividend_data[ticker] = { "error": str(e) }
         return dividend_data
