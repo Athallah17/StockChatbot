@@ -14,7 +14,6 @@ const useMarketLive = (params: TickerListRequest) => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   })
-
   return { prices: data, isLoading, isFetching, error }
 }
 

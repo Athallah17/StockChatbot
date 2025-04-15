@@ -38,11 +38,13 @@ export interface AnalyzerFullResponse {
 export const AnalyzerApi = {
     getTrendAndGrowth: async (payload: AnalyzerRequest): Promise<AnalyzerBasicResponse> => {
     const res = await API_STOCKBOT.post(API_URLS.ANALYZER_TREND, payload)
+    console.log('Trend:', res.data)
     return res.data
     },
 
     getFullAnalysis: async (payload: AnalyzerRequest): Promise<AnalyzerFullResponse> => {
     const res = await API_STOCKBOT.post(API_URLS.ANALYZER_FULL, payload)
+    console.log('Full:', res.data)
     return res.data
     }
 }
