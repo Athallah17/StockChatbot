@@ -4,8 +4,9 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from '@/utils/provider';
-import Headers from '@/components/headers';
+import Navbar from '@/components/navbar';
 import Footers from '@/components/footers';
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,7 +29,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
       <AntdRegistry>
         <Providers>
           <div className="flex flex-col min-h-screen">
-            <Headers />
+            <Navbar />
             <main className="flex-grow">{children}</main>
             <Footers />
           </div>

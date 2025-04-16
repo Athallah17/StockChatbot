@@ -1,13 +1,24 @@
 'use client'
-import { Layout } from "antd";
 
-
-const Footers = () => {
-    return (
-        <Layout.Footer className="bg-gray-200 text-gray-700 text-sm py-4 px-6 flex justify-center items-center">
-            &copy; 2023 Stockers12131. All rights reserved. Footers
-        </Layout.Footer>
-    )
+const Footer = () => {
+  return (
+    <footer className="bg-[#0E6EFF] text-white px-6 md:px-12 lg:px-12 py-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-8">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Stockers</h2>
+          <p className="text-sm text-white/80">Empowering investors with smart data & insights.</p>
+        </div>
+        <div className="space-y-2">
+          <p className="font-semibold">Contact</p>
+          <p>Email: support@stockers.ai</p>
+          <p>Phone: +62 812-3456-7890</p>
+        </div>
+      </div>
+      <div className="text-center mt-8 text-white/60 text-sm">
+        © {new Date().getFullYear()} Stockers. All rights reserved.
+      </div>
+    </footer>
+  )
 }
 
-export default Footers;
+export default Footer
