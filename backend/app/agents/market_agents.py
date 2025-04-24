@@ -1,4 +1,5 @@
 import yfinance as yf
+import statistics
 from crewai import Agent
 from typing import List, Dict, Any
 from app.utils.summarizer import generate_summary
@@ -137,3 +138,39 @@ class MarketAgent:
             except Exception as e:
                 dividend_data[ticker] = { "error": str(e) }
         return dividend_data
+    
+    async def get_analysis(self, tickers: List[str], period: str = "3mo", interval: str = "1d") -> Dict[str, Any]:
+        data = {}
+        for ticker in tickers:
+            try:
+                stock = yf.Ticker(ticker)
+                hist = stock.history(period=period, interval=interval).reset_index()
+
+                closes = hist['Close'].tolist()
+                highs = hist['High'].tolist()
+                lows = hist['Low'].tolist()
+                pe_ratio = stock.info.get("trailingPE")
+
+                trend = "sideways"
+                if len(closes) >= 2:
+                    change = closes[-1] - closes[0]
+                    avg = statistics.mean(closes)
+                    if abs(change) > avg * 0.05:
+                        trend = "upward" if change > 0 else "downward"
+                    elif statistics.stdev(closes) / avg > 0.05:
+                        trend = "volatile"
+
+                    growth_pct = ((closes[-1] - closes[0]) / closes[0]) * 100 if closes[0] else 0
+                else:
+                    growth_pct = 0
+
+                data[ticker] = {
+                    "trend": trend,
+                    "growth_pct": round(growth_pct, 2),
+                    "support": round(min(lows), 2) if lows else None,
+                    "resistance": round(max(highs), 2) if highs else None,
+                    "PE_ratio": pe_ratio
+                }
+            except Exception as e:
+                data[ticker] = {"error": str(e)}
+        return data

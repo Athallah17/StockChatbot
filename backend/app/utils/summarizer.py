@@ -4,7 +4,7 @@ import os
 openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 print ("key", openai)
 
-async def generate_summary(prompt: str, system_prompt: str = "You are a stock market analyst.") -> str:
+async def generate_summary(prompt: str, system_prompt: str = "You are a stock market analyst. Your task is to generate a detailed response or summarize the given data in a way that is easy to understand for beginner to novice market enthusiasts and traders.") -> str:
     try:
         response = await openai.chat.completions.create(
             model="gpt-3.5-turbo",
