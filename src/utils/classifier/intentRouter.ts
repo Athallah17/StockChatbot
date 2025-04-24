@@ -32,11 +32,20 @@ export const handleIntentRouting = async (
   
       case "trend": {
         const res = await AnalyzerApi.getTrendAndGrowth(payload);
-        const trend = res?.analysis?.trend?.[ticker];
-        const growth = res?.analysis?.growth?.[ticker];
-        if (!trend || !growth)
-          return `⚠️ No trend/growth info available for ${ticker}`;
-        return `📊 **${ticker}**\nTrend: ${trend}\nGrowth: ${growth.growth_pct}%`;
+        const trendData = res?.analysis?.[ticker];
+        if (!trendData) return `⚠️ No trend/growth info available for ${ticker}`;
+
+        const { trend, growth_pct, raw, summary } = trendData;
+        const startPrice = raw?.start?.toFixed(2) || "N/A";
+        const endPrice = raw?.end?.toFixed(2) || "N/A";
+
+        return (
+          `📊 **${ticker} Trend Analysis**\n` +
+          `📈 Trend: ${trend}\n` +
+          `📉 Growth: ${growth_pct}%\n` +
+          `💵 Price Change: From $${startPrice} to $${endPrice}\n` +
+          `📝 Summary: ${summary}`
+        );
       }
   
       case "historical": {
