@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import example, fetchdata
+from .routes import fetchdata, market, analyzer, crew_analyst, crew_buysell
 
-app = FastAPI()
+app = FastAPI(title="Stock Chatbot API")
 
 # Add CORS middleware
 app.add_middleware(
@@ -13,8 +13,13 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.include_router(example.router)
-app.include_router(fetchdata.router)
+app.include_router(fetchdata.router,prefix="/api")
+app.include_router(market.router,prefix="/api")
+app.include_router(analyzer.router,prefix="/api")
+app.include_router(crew_analyst.router,prefix="/api")
+app.include_router(crew_buysell.router,prefix="/api")
+
+
 
 @app.get("/")
 def read_root():

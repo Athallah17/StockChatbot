@@ -1,82 +1,60 @@
-'use client';
-import { useState } from 'react';
-import Markdown from 'react-markdown';
-import { Layout, Input, Button, message as antdMessage } from 'antd';
-import { SendOutlined } from '@ant-design/icons';
-import {getAnswer, getPredictions} from '@/utils/api';
+'use client'
 
+import { useState } from 'react'
+import { useChatMutation } from '@/hooks/useChatMutation'
+import { ChatMessages,ChatInput,ChatSidebar } from '@/components/chat'
 
-const { Content, Sider, Header } = Layout;
-const { TextArea } = Input;
+const Chatbots= () => {
+  const chatMutation = useChatMutation()
+  const [messages, setMessages] = useState([
+      { sender: 'bot', text: '👋 Hello! Ask me anything about the stock market.' },
+  ])
+  const [input, setInput] = useState('')
 
-const Chatbots = () => {
-    const [messages, setMessages] = useState([
-        { sender: 'bot', text: 'Hello! How can I assist you today?' }
-    ]);
-    const [input, setInput] = useState('');
+  const handleSend = async () => {
+      if (!input.trim()) return
+      setMessages((prev) => [...prev, { sender: 'user', text: input }])
+  
+      try {
+        const reply = await chatMutation.mutateAsync(input)
+        setMessages((prev) => [...prev, { sender: 'bot', text: reply }])
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { sender: 'bot', text: '❌ Oops! Something went wrong.' },
+        ])
+      } finally {
+        setInput('')
+      }
+    }
 
-    const handleSend = async () => {
-        if (input.trim()) {
-            setMessages([...messages, { sender: 'user', text: input }]);
-            setInput('');
+return (
+  <div className="flex h-screen">
+    {/* Optional Sidebar */}
+    <ChatSidebar />
 
-            try {
-                const response = await getAnswer(input);
-                const botMessage = response.choices?.[0]?.message?.content || 'No response';
-                setMessages((prev) => [...prev, { sender: 'bot', text: botMessage }]);
-            } catch (error) {
-                console.error('OpenAI API Error:', error);
-                setMessages((prev) => [...prev, { sender: 'bot', text: 'Oops! Something went wrong.' }]);
-            }
-        }
-    };
+    {/* Chat Panel */}
+    <div className="flex flex-col w-full h-full bg-neutral-100">
+      {/* Message Container */}
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+        <div className="max-w-3xl mx-auto space-y-4">
+          <ChatMessages messages={messages} />
+        </div>
+      </div>
 
-    return (
-        <Layout className="h-screen">
-            <Sider theme="dark" className="p-4">
-                <div className="text-2xl font-bold mb-4">Menu</div>
-                <ul className='font-semibold'>
-                    <li className="mb-6 cursor-pointer">History</li>
-                    <li className="mb-6 cursor-pointer">Settings</li>
-                </ul>
-            </Sider>
-            <Layout>
-                <Content className="p-4 flex flex-col h-full overflow-hidden">
-                    <div className="flex-grow overflow-y-auto mb-4">
-                        {messages.map((msg, index) => (
-                            <div
-                                key={index}
-                                className={`mb-2 p-2 m-2 max-w-xs ${
-                                    msg.sender === 'user'
-                                        ? 'bg-blue-500 text-white ml-auto'
-                                        : 'bg-gray-200'
-                                } rounded-lg`}
-                            >
-                                <Markdown>{msg.text}</Markdown>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex gap-2">
-                        <TextArea
-                            rows={2}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type a message..."
-                            className="flex-grow"
-                            onPressEnter={handleSend}
-                        />
-                        <Button
-                            type="primary"
-                            icon={<SendOutlined />}
-                            onClick={handleSend}
-                        >
-                            Send
-                        </Button>
-                    </div>
-                </Content>
-            </Layout>
-        </Layout>
-    );
-};
+      {/* Input */}
+      <div className="w-full border-t border-gray-200 bg-white p-4 sticky bottom-0">
+        <div className="max-w-3xl mx-auto">
+            <ChatInput
+          value={input}
+          onChange={setInput}
+          onSend={handleSend}
+            />
+        </div>
+      </div>
+    </div>
+  </div>
+)
+}
 
-export default Chatbots;
+export default Chatbots
