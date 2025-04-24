@@ -1,6 +1,7 @@
 import { classifyIntent, IntentType } from './classifyIntent'
 import { AnalyzerApi } from '@/utils/api/analyzer-api'
 import { MarketApi } from '@/utils/api/market-api'
+import { CrewApi } from '@/utils/api/crew-api'
 
 interface ParsedIntent {
   intent: IntentType
@@ -22,6 +23,7 @@ export const handleIntentRouting = async (
       interval: "1d"
     };
   
+    console.log('Intent:', intent)
     switch (intent) {
       case "live_price": {
         const res = await MarketApi.getLivePrices({ tickers: [ticker] });
@@ -89,7 +91,26 @@ export const handleIntentRouting = async (
           (support?.summary ? `📊 ${support.summary}` : "")
         );
       }
-  
+
+      case 'buy_sell': {
+        const res = await CrewApi.getBuySellRecommendation(payload);
+      
+        return res
+          .map((r) => {
+            const { ticker, metrics, recommendation } = r;
+            return (
+              `🧾 **Buy/Sell Recommendation for \`${ticker}\`**\n\n` +
+              `**📉 Trend:** ${metrics.trend}\n` +
+              `**📊 Growth %:** ${metrics.growth_pct}%\n` +
+              `**📈 Support Level:** ${metrics.support}\n` +
+              `**🛑 Resistance Level:** ${metrics.resistance}\n` +
+              `**💼 PE Ratio:** ${metrics.PE_ratio}\n\n` +
+              `${recommendation}`
+            );
+          })
+          .join('\n\n---\n\n');
+      }
+
       default:
         return `❓ Sorry, I couldn't understand your request. Try asking about stock prices, trends, or financials.`;
     }

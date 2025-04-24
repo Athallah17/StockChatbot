@@ -6,6 +6,8 @@ export type IntentType =
   | 'financial'
   | 'dividends'
   | 'sector_info'
+  | 'buy_sell'
+  | 'analysis'
   | 'unknown'
 
 export const classifyIntent = (message: string): IntentType => {
@@ -18,6 +20,8 @@ export const classifyIntent = (message: string): IntentType => {
   if (/financial|pe|eps|market cap/.test(msg)) return 'financial'
   if (/dividend|earnings/.test(msg)) return 'dividends'
   if (/sector|industry/.test(msg)) return 'sector_info'
+  if (/buy|sell|recommend|suggest|advice/.test(msg)) return 'buy_sell'
+  if (/analysis|analyze|analyzer|crew/.test(msg)) return 'analysis'
 
   return 'unknown'
 }
