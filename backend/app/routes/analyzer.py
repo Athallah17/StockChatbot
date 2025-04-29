@@ -39,8 +39,6 @@ async def full_analysis(request: AnalysisRequest):
     )
 
     return {
-        "analysis": {
             "detailed": detailed,
             "support_resistance": support
-        }
     }
