@@ -14,26 +14,22 @@ const Chatbots= () => {
   const [input, setInput] = useState('')
 
   const handleSend = async () => {
-      if (!input.trim()) return
-      setMessages((prev) => [...prev, { sender: 'user', text: input }])
+    if (!input.trim()) return
+    setMessages((prev) => [...prev, { sender: 'user', text: input }])
   
-      try {
-        const res = await askAsync({ message: input })
-        console.log("Answer:", res.response)
-        setMessages((prev) => [...prev, { sender: 'bot', text: res.response.price }])
-
-        // const reply = await chatMutation.mutateAsync(input)
-        // setMessages((prev) => [...prev, { sender: 'bot', text: reply }])
-
-      } catch {
-        setMessages((prev) => [
-          ...prev,
-          { sender: 'bot', text: '❌ Oops! Something went wrong.' },
-        ])
-      } finally {
-        setInput('')
-      }
+    try {
+      const res = await askAsync({ message: input })
+      console.log("Answer:", res)
+      setMessages((prev) => [...prev, { sender: 'bot', text: res }])
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', text: '❌ Oops! Something went wrong.' },
+      ])
+    } finally {
+      setInput('')
     }
+  }
 
 return (
   <div className="flex h-screen">
@@ -45,7 +41,7 @@ return (
       {/* Message Container */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-4">
-          <ChatMessages messages={messages} />
+          <ChatMessages messages={messages} isLoading={isAsking} />
         </div>
       </div>
 

@@ -7,7 +7,7 @@ export interface AskRequest {
 
 export interface AskResponse {
     action : string
-    response: any
+    response: string[]
 }
 
 export const AskApi = {

@@ -1,31 +1,55 @@
-import Markdown from 'react-markdown'
+'use client'
 
-interface Props {
-  messages: { sender: string; text: string }[]
-}
+import { ChatMessageRenderer } from './ChatRenderer'
+import LoadingMessage from './Loading'
+import { Bot, User } from 'lucide-react'
+import { Message } from '@/types/chat'
 
-const ChatMessages = ({ messages }: Props) => {
+const ChatMessages = ({ messages, isLoading }: { messages: Message[]; isLoading: boolean }) => {
   return (
-    <>
-      {messages.map((msg, index) => (
-        <div
-          key={index}
-          className={`flex px-3 py-2 ${
-            msg.sender === 'user' ? 'justify-end' : 'justify-start'
-          }`}
-        >
+    <div className="space-y-4">
+      {messages.map((msg, idx) => {
+        const isUser = msg.sender === 'user'
+        return (
           <div
-            className={`px-4 py-3 rounded-2xl max-w-[80%] whitespace-pre-wrap shadow-sm ${
-              msg.sender === 'user'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-black border'
+            key={idx}
+            className={`flex items-start gap-2 ${
+              isUser ? 'justify-end' : 'justify-start'
             }`}
           >
-            <Markdown>{msg.text}</Markdown>
+            {/* Left Avatar (Bot) */}
+            {!isUser && (
+              <div className="flex-shrink-0">
+                <div className="bg-gray-200 rounded-full p-2">
+                  <Bot className="w-8 h-8 text-gray-600" />
+                </div>
+              </div>
+            )}
+
+            {/* Message Bubble */}
+            <div
+              className={`max-w-[80%] px-4 py-2 rounded-2xl shadow-sm ${
+                isUser
+                  ? 'bg-blue-500 text-white rounded-br-none'
+                  : 'bg-white text-gray-800 rounded-bl-none border'
+              }`}
+            >
+              <ChatMessageRenderer message={msg} />
+            </div>
+
+            {/* Right Avatar (User) */}
+            {isUser && (
+              <div className="flex-shrink-0">
+                <div className="bg-blue-100 rounded-full p-2">
+                  <User className="w-8 h-8 text-blue-600" />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      ))}
-    </>
+        )
+      })}
+      {isLoading && <LoadingMessage />}
+    </div>
   )
 }
 
