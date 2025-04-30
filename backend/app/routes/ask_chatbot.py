@@ -53,7 +53,5 @@ async def ask_bot(request: AskRequest):
     # Step 3: Return detailed response
     return {
         "action": action,
-        "route": route,
-        "payload": payload,
         "response": api_response
     }
