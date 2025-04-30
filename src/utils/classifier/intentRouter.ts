@@ -28,6 +28,7 @@ export const handleIntentRouting = async (
       case "live_price": {
         const res = await MarketApi.getLivePrices({ tickers: [ticker] });
         const data = res[ticker];
+        console.log('live',data)
         if (!data) return "No data found.";
         return `💵 **${ticker} Price**: $${data.price}\n📝 ${data.summary}`;
       }

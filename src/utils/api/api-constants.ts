@@ -16,5 +16,9 @@ export const API_URLS = {
   // === CREWAI ROUTES ===
   CREW_STOCK_ANALYSIS: '/crew/stock-analysis',
   CREW_BUY_SELL: '/crew/buy-sell',
+
+
+  // === CHATBOT ROUTES ===
+  CHATBOT: '/ask',
 };
 

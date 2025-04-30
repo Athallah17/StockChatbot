@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { useChatMutation } from '@/hooks/useChatMutation'
+import useAsk from '@/hooks/useAskChatbot'
 import { ChatMessages,ChatInput,ChatSidebar } from '@/components/chat'
 
 const Chatbots= () => {
   const chatMutation = useChatMutation()
+  const { askAsync, isAsking } = useAsk()
   const [messages, setMessages] = useState([
       { sender: 'bot', text: '👋 Hello! Ask me anything about the stock market.' },
   ])
@@ -16,8 +18,13 @@ const Chatbots= () => {
       setMessages((prev) => [...prev, { sender: 'user', text: input }])
   
       try {
-        const reply = await chatMutation.mutateAsync(input)
-        setMessages((prev) => [...prev, { sender: 'bot', text: reply }])
+        const res = await askAsync({ message: input })
+        console.log("Answer:", res.response)
+        setMessages((prev) => [...prev, { sender: 'bot', text: res.response.price }])
+
+        // const reply = await chatMutation.mutateAsync(input)
+        // setMessages((prev) => [...prev, { sender: 'bot', text: reply }])
+
       } catch {
         setMessages((prev) => [
           ...prev,
