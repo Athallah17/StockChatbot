@@ -15,7 +15,7 @@ class MarketAgent:
         )
 
     async def get_market_data(self, tickers: List[str], period: str = "1mo", interval: str = "1d") -> Dict[str, Any]:
-        data = {}
+        result = {"tickers": []}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
@@ -26,16 +26,24 @@ class MarketAgent:
                 prompt = f"Summarize the historical market data of {ticker} for the last {period}: {records[-5:]}"  # last 5 days
                 summary = await generate_summary(prompt)
 
-                data[ticker] = {
-                    "raw": records,
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": {
+                        "historical_data": records
+                    },
                     "summary": summary
-                }
+                })
             except Exception as e:
-                data[ticker] = { "error": str(e) }
-        return data
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
+        return result
 
     async def get_live_price(self, tickers: List[str]) -> Dict[str, Any]:
-        prices = {}
+        result = {"tickers": []}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
@@ -44,47 +52,54 @@ class MarketAgent:
                 prompt = f"What is the current market price of {ticker}? It is {price}."
                 summary = await generate_summary(prompt)
 
-                prices[ticker] = {
-                    "price": price,
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": {
+                        "price": price
+                    },
                     "summary": summary
-                }
-
+                })
             except Exception as e:
-                prices[ticker] = { "error": str(e) }
-
-        return prices
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
+        return result
 
 
     async def get_financials(self, tickers: List[str]) -> Dict[str, Any]:
-        financial_data = {}
+        result = {"tickers": []}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
                 info = stock.info
-                pe = info.get("trailingPE")
-                eps = info.get("trailingEps")
-                cap = info.get("marketCap")
-
                 raw = {
-                    "PE_ratio": pe,
-                    "EPS": eps,
-                    "market_cap": cap
+                    "PE_ratio": info.get("trailingPE"),
+                    "EPS": info.get("trailingEps"),
+                    "market_cap": info.get("marketCap")
                 }
 
                 prompt = f"Summarize the financial condition of {ticker} with these values: {raw}"
                 summary = await generate_summary(prompt)
 
-                financial_data[ticker] = {
+                result["tickers"].append({
+                    "symbol": ticker,
                     "raw": raw,
                     "summary": summary
-                }
-
+                })
             except Exception as e:
-                financial_data[ticker] = { "error": str(e) }
-        return financial_data
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
+        return result
 
     async def get_sector_industry(self, tickers: List[str]) -> Dict[str, Any]:
-        sector_data = {}
+        result = {"tickers": []}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
@@ -97,16 +112,22 @@ class MarketAgent:
                 prompt = f"Explain the sector and industry of {ticker}: {raw}"
                 summary = await generate_summary(prompt)
 
-                sector_data[ticker] = {
+                result["tickers"].append({
+                    "symbol": ticker,
                     "raw": raw,
                     "summary": summary
-                }
-
+                })
             except Exception as e:
-                sector_data[ticker] = { "error": str(e) }
-        return sector_data
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
+        return result
+    
     async def get_dividends_and_earnings(self, tickers: List[str]) -> Dict[str, Any]:
-        dividend_data = {}
+        result = {"tickers": []}
         for ticker in tickers:
             try:
                 stock = yf.Ticker(ticker)
@@ -130,14 +151,19 @@ class MarketAgent:
                 prompt = f"Summarize recent dividend and earnings info for {ticker}: {raw}"
                 summary = await generate_summary(prompt)
 
-                dividend_data[ticker] = {
+                result["tickers"].append({
+                    "symbol": ticker,
                     "raw": raw,
                     "summary": summary
-                }
-
+                })
             except Exception as e:
-                dividend_data[ticker] = { "error": str(e) }
-        return dividend_data
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
+        return result
     
     async def get_analysis(self, tickers: List[str], period: str = "3mo", interval: str = "1d") -> Dict[str, Any]:
         data = {}

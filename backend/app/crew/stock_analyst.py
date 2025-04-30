@@ -30,8 +30,18 @@ class StockAnalysisCrew:
         )
 
         # === Step 4: Kickoff (this will simulate collaboration)
-        result = crew.kickoff()
-        print (result)
+        crew_output = crew.kickoff()
+
+        # Extract task outputs
+        tasks_output = []
+        for task in crew_output.tasks_output:
+            tasks_output.append({
+                "agent": task.agent,
+                "description": task.description,
+                "raw": task.raw
+            })
+
         return {
-            "crew_summary": result
+            "summary": crew_output.raw,  # Final summary from the Crew
+            "tasks_output": tasks_output
         }

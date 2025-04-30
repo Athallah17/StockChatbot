@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
 from app.crew.stock_analyst import StockAnalysisCrew
-import ast, json
+import json
 
 router = APIRouter()
 crew_runner = StockAnalysisCrew()
@@ -20,26 +20,19 @@ async def run_stock_analysis_crew(request: CrewRequest):
         interval=request.interval
     )
 
-    # crew_summary is a CrewOutput object
-    crew_summary = result["crew_summary"]
-
-    summary_text = crew_summary.raw  # full final summary
-
-    # Get market data from the first task (Market Data Collector)
+    # Extract summary and market data
+    summary_text = result["summary"]
     market_data_raw = None
-    for task in crew_summary.tasks_output:
-        if task.agent == "Market Data Collector":
-            market_data_raw = task.raw
+    for task in result["tasks_output"]:
+        if task["agent"] == "Market Data Collector":
+            market_data_raw = task["raw"]
             break
 
-    # Convert raw string JSON to dict
+    # Parse market data
     try:
         market_data = json.loads(market_data_raw)
     except Exception:
-        try:
-            market_data = ast.literal_eval(market_data_raw)
-        except:
-            market_data = {"error": "Failed to parse market data"}
+        market_data = {"error": "Failed to parse market data"}
 
     return {
         "summary": summary_text,

@@ -15,13 +15,12 @@ class AnalysisRequest(BaseModel):
 # === Route: Basic Analysis (Trend + Growth)
 @router.post("/analyzer/trend")
 async def basic_analysis(request: AnalysisRequest):
-    return {
-        "analysis": await analyzer_agent.analyze(
-            tickers=request.tickers,
-            period=request.period,
-            interval=request.interval
-        )
-    }
+    analysis = await analyzer_agent.analyze(
+        tickers=request.tickers,
+        period=request.period,
+        interval=request.interval
+    )
+    return analysis
 
 # === Route: Full Statistical Analysis (Optional)
 @router.post("/analyzer/full")
@@ -38,7 +37,13 @@ async def full_analysis(request: AnalysisRequest):
         interval=request.interval
     )
 
-    return {
-            "detailed": detailed,
-            "support_resistance": support
-    }
+# Combine results per ticker
+    result = {"tickers": []}
+    for ticker in request.tickers:
+        result["tickers"].append({
+            "symbol": ticker,
+            "detailed": detailed.get(ticker, {"raw": None, "summary": None, "error": "No data"}),
+            "support_resistance": support.get(ticker, {"raw": None, "summary": None, "error": "No data"})
+        })
+
+    return result

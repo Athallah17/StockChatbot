@@ -19,10 +19,13 @@ async def run_buy_sell_crew(request: BuySellRequest):
 
     for ticker in request.tickers:
         result = await crew.run(ticker=ticker, period=request.period, interval=request.interval)
+
+        # Handle cases where 'metrics' or 'recommendation' might not exist
         responses.append({
-            "ticker": result["ticker"],
-            "metrics": result["metrics"],
-            "recommendation": result["recommendation"].raw
+            "ticker": result.get("ticker"),
+            "metrics": result.get("metrics", None),  # Default to None if 'metrics' is missing
+            "recommendation": result.get("recommendation", None),  # Default to None if 'recommendation' is missing
+            "error": result.get("error", None)  # Include error if present
         })
 
     return responses

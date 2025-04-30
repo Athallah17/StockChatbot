@@ -28,12 +28,17 @@ class AnalyzerAgent:
 
     async def analyze(self, tickers: List[str], period="3mo", interval="1d") -> Dict[str, Any]:
         data = self.get_market_data(tickers, period, interval)
-        result = {}
+        result = {"tickers": []}
         for ticker, price_data in data.items():
             try:
                 closes = [entry['Close'] for entry in price_data if 'Close' in entry]
                 if len(closes) < 2:
-                    result[ticker] = {"error": "Not enough data"}
+                    result["tickers"].append({
+                        "symbol": ticker,
+                        "raw": None,
+                        "summary": None,
+                        "error": "Not enough data"
+                    })
                     continue
 
                 change = closes[-1] - closes[0]
@@ -56,18 +61,24 @@ class AnalyzerAgent:
                 prompt = f"Summarize the trend and growth performance of {ticker} based on this data: {raw}"
                 summary = await generate_summary(prompt)
 
-                result[ticker] = {
+                result["tickers"].append({
+                    "symbol": ticker,
                     "raw": raw,
                     "summary": summary
-                }
+                })
 
             except Exception as e:
-                result[ticker] = { "error": str(e) }
+                result["tickers"].append({
+                    "symbol": ticker,
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                })
 
         return result
 
     async def analyze_from_data(self, historical_data: Dict[str, List[Dict]]) -> Dict[str, Any]:
-        insights = {}
+        result = {}
         for ticker, records in historical_data.items():
             try:
                 df = pd.DataFrame(records)
@@ -75,7 +86,11 @@ class AnalyzerAgent:
                 df.dropna(subset=['Close'], inplace=True)
 
                 if df.empty:
-                    insights[ticker] = {"error": "Invalid or missing data"}
+                    result[ticker] = {
+                        "raw": None,
+                        "summary": None,
+                        "error": "Invalid or missing data"
+                    }
                     continue
 
                 start_price = df['Close'].iloc[0]
@@ -95,15 +110,19 @@ class AnalyzerAgent:
                 prompt = f"Give a concise analysis for {ticker} based on this: {raw}"
                 summary = await generate_summary(prompt)
 
-                insights[ticker] = {
+                result[ticker] = {
                     "raw": raw,
                     "summary": summary
                 }
 
             except Exception as e:
-                insights[ticker] = {"error": str(e)}
+                result[ticker] = {
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                }
 
-        return insights
+        return result
 
     async def analyze_support_resistance(self, tickers: List[str], period="3mo", interval="1d") -> Dict[str, Any]:
         data = self.get_market_data(tickers, period, interval)
@@ -114,7 +133,11 @@ class AnalyzerAgent:
                 highs = [entry['High'] for entry in price_data if 'High' in entry]
                 lows = [entry['Low'] for entry in price_data if 'Low' in entry]
                 if not highs or not lows:
-                    result[ticker] = {"error": "Insufficient data"}
+                    result[ticker] = {
+                        "raw": None,
+                        "summary": None,
+                        "error": "Insufficient data"
+                    }
                     continue
 
                 raw = {
@@ -131,6 +154,10 @@ class AnalyzerAgent:
                 }
 
             except Exception as e:
-                result[ticker] = {"error": str(e)}
+                result[ticker] = {
+                    "raw": None,
+                    "summary": None,
+                    "error": str(e)
+                }
 
         return result

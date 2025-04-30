@@ -10,8 +10,12 @@ class BuySellCrew:
     async def run(self, ticker: str, period: str = "3mo", interval: str = "1d") -> dict:
         # Step 1: Fetch analysis
         analysis = await self.market_agent.get_analysis([ticker], period, interval)
-        metrics = analysis.get(ticker)
-    
+        metrics = analysis.get(ticker) if analysis else None
+
+        # Handle cases where metrics are None or contain an error
+        if not metrics:
+            return {"ticker": ticker, "error": "No data returned from analysis"}
+
         if "error" in metrics:
             return {"ticker": ticker, "error": metrics["error"]}
 
@@ -31,9 +35,11 @@ class BuySellCrew:
             verbose=True
         )
 
+        # Extract specific recommendation.raw value
         summary = crew.kickoff()
+        
         return {
             "ticker": ticker,
             "metrics": metrics,
-            "recommendation": summary
+            "recommendation": summary.raw # Return only the raw recommendation
         }
