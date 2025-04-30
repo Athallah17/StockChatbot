@@ -12,7 +12,7 @@ ACTION_ROUTE_MAP = {
     "get_live_price": "/api/market/prices",
     "get_historical_data": "/api/market/historical",
     "get_financials": "/api/market/financials",
-    "get_sector_data": "/api/market/sector",
+    "get_sector_data": "/api/market/sector-info",
     "get_dividends": "/api/market/dividends",
     "analyze_trend": "/api/analyzer/trend",
     "analyze_full": "/api/analyzer/full",
