@@ -16,8 +16,10 @@ ACTION_ROUTE_MAP = {
     "get_dividends": "/api/market/dividends",
     "analyze_trend": "/api/analyzer/trend",
     "analyze_full": "/api/analyzer/full",
-    "crew_summary": "/api/crew/analyst",
-    "crew_buy_sell": "/api/crew/buy-sell"
+    "crew_stock_summary": "/api/crew/stock-analysis",
+    "crew_buy_sell": "/api/crew/buy-sell",
+    "get_sentiment": "/api/news/sentiment",
+    "analyze_sentiment": "/api/news/sentiment",
 }
 
 class AskRequest(BaseModel):

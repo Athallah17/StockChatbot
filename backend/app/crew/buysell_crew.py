@@ -1,6 +1,8 @@
 from crewai import Task, Crew
+import httpx
 from app.agents.market_agents import MarketAgent
 from app.agents.buysell_agents import BuySellAgent
+from app.agents.news_sentiment import get_sentiment_for_topic
 
 class BuySellCrew:
     def __init__(self):
@@ -19,10 +21,13 @@ class BuySellCrew:
         if "error" in metrics:
             return {"ticker": ticker, "error": metrics["error"]}
 
-        # Step 2: Build prompt
-        prompt = self.buy_sell_agent.build_prompt(ticker, metrics)
+        # Step 2: Fetch news sentiment
+        news_sentiment = get_sentiment_for_topic(ticker)
 
-        # Step 3: Create and execute task
+        # Step 3: Build CrewAI prompt using both metrics & sentiment
+        prompt = self.buy_sell_agent.build_prompt(ticker, metrics, news_sentiment)
+
+        # Step 4: Create task and run crew
         recommendation_task = Task(
             description=prompt,
             agent=self.buy_sell_agent.agent,
@@ -35,11 +40,11 @@ class BuySellCrew:
             verbose=True
         )
 
-        # Extract specific recommendation.raw value
         summary = crew.kickoff()
-        
+        print(news_sentiment)
         return {
             "ticker": ticker,
             "metrics": metrics,
-            "recommendation": summary.raw # Return only the raw recommendation
+            "news_sentiment": news_sentiment,
+            "recommendation": summary.raw
         }
