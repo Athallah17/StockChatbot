@@ -1,7 +1,8 @@
 // components/chat/ChatMessageRenderer.tsx
 import { Message } from '@/types/chat'
-import { DollarSign, Brain } from 'lucide-react'
+import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import HistoricalChart from './Chart'
 
 export function ChatMessageRenderer({ message }: { message: Message }) {
   if (message.sender === 'user') {
@@ -29,6 +30,284 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
             ))}
             </div>
         )
+    case 'get_historical_data':
+        return(
+            <div className="text-left space-y-2">
+                {response.tickers.map((ticker: any) => (
+                        <div
+                        key={ticker.symbol}
+                        className="p-4 text-sm text-gray-800"
+                        >
+                        <div className="flex items-center gap-2 font-bold text-blue-600 mb-2">
+                            <LineChart className="w-8 h-8" />
+                                {ticker.symbol} Historical Data 
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-3">{ticker.summary}</p>
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full text-xs border border-gray-200">
+                            <thead className="bg-gray-100 text-gray-700">
+                                <tr>
+                                <th className="px-3 py-2 text-left border">Date</th>
+                                <th className="px-3 py-2 text-right border">Open</th>
+                                <th className="px-3 py-2 text-right border">High</th>
+                                <th className="px-3 py-2 text-right border">Low</th>
+                                <th className="px-3 py-2 text-right border">Close</th>
+                                <th className="px-3 py-2 text-right border">Volume</th>
+                                <th className="px-3 py-2 text-right border">Dividends</th>
+                                <th className="px-3 py-2 text-right border">Splits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ticker.raw.historical_data.map((row: any, idx: number) => (
+                                <tr key={idx} className="border-t">
+                                    <td className="px-3 py-2">{new Date(row.Date).toLocaleDateString()}</td>
+                                    <td className="px-3 py-2 text-right">${row.Open.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">${row.High.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">${row.Low.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">${row.Close.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">{row.Volume.toLocaleString()}</td>
+                                    <td className="px-3 py-2 text-right">{row.Dividends}</td>
+                                    <td className="px-3 py-2 text-right">{row['Stock Splits']}</td>
+                                </tr>
+                                ))}
+                            </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    ))}
+            </div>
+        )
+        case 'get_financials':
+                return (
+                <div className="space-y-4">
+                    {response.tickers.map((ticker: any) => (
+                    <div
+                        key={ticker.symbol}
+                        className="p-4 bg-white text-sm text-gray-800"
+                    >
+                        {/* Title */}
+                        <div className="flex items-center gap-2 font-bold text-amber-600 mb-2">
+                        <BarChart3 className="w-8 h-8" />
+                        {ticker.symbol} Financials
+                        </div>
+            
+                        {/* Summary */}
+                        <p className="text-gray-600 mb-2">{ticker.summary}</p>
+            
+                        {/* Metrics */}
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <strong>P/E Ratio:</strong> {ticker.raw.PE_ratio.toFixed(2)}
+                        </div>
+                        <div>
+                            <strong>EPS:</strong> {ticker.raw.EPS}
+                        </div>
+                        <div>
+                            <strong>Market Cap:</strong> ${Number(ticker.raw.market_cap).toLocaleString()}
+                        </div>
+                        </div>
+                    </div>
+                    ))}
+                </div>
+                )
+            case 'get_sector_data':
+                return (
+                    <div className="space-y-4">
+                        {response.tickers.map((ticker: any) => (
+                        <div
+                            key={ticker.symbol}
+                            className="p-4 text-sm text-gray-800"
+                        >
+                            {/* Title */}
+                            <div className="flex items-center gap-2 font-bold text-cyan-700 mb-2">
+                            <Briefcase className="w-8 h-8" />
+                            {ticker.symbol} Sector Info
+                            </div>
+                
+                            {/* Summary */}
+                            <p className="text-gray-600 mb-2">{ticker.summary}</p>
+                
+                            {/* Sector Details */}
+                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <strong>Sector:</strong> {ticker.raw.sector}
+                            </div>
+                            <div>
+                                <strong>Industry:</strong> {ticker.raw.industry}
+                            </div>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                    )
+            case 'analyze_trend':
+                return (
+                    <div className="space-y-4">
+                        {response.tickers.map((ticker: any) => (
+                            <div
+                                key={ticker.symbol}
+                                className="p-4 text-sm text-gray-800"
+                            >
+                            <div className="flex items-center gap-2 font-bold text-blue-600 mb-1">
+                                <LineChart className="w-8 h-8" />
+                                    {ticker.symbol} Trend Analysis
+                            </div>
+                      
+                                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                                    <div><strong>Trend:</strong> {ticker.raw.trend}</div>
+                                    <div><strong>Growth %:</strong> {ticker.raw.growth_pct}%</div>
+                                    <div><strong>Start Price:</strong> ${ticker.raw.start.toFixed(2)}</div>
+                                    <div><strong>End Price:</strong> ${ticker.raw.end.toFixed(2)}</div>
+                                </div>
+                      
+                                <div className="prose prose-sm max-w-none">
+                                    <ReactMarkdown>
+                                        {ticker.summary}
+                                    </ReactMarkdown>
+                                </div>
+                            </div>
+                            ))}
+                        </div>
+                        )
+            case 'analyze_full':
+                 return (
+                    <div className="space-y-4">
+                        {response.tickers.map((ticker: any) => (
+                            <div
+                                key={ticker.symbol}
+                                className="p-4 text-sm text-gray-800 space-y-4"
+                            >
+                            {/* Header */}
+                            <div className="flex items-center gap-2 font-bold text-pink-600">
+                                <PieChart className="w-8 h-8" />
+                                    {ticker.symbol} Full Analysis
+                            </div>
+                          
+                            {/* Detailed Price Info */}
+                            <div>
+                                <h4 className="font-semibold text-gray-700 mb-1">📊 Price Metrics</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div><strong>Start:</strong> ${ticker.detailed.raw.start_price.toFixed(2)}</div>
+                                    <div><strong>End:</strong> ${ticker.detailed.raw.end_price.toFixed(2)}</div>
+                                    <div><strong>Change %:</strong> {ticker.detailed.raw.price_change_percent}%</div>
+                                    <div><strong>Average:</strong> ${ticker.detailed.raw.average_price.toFixed(2)}</div>
+                                    <div><strong>Volatility:</strong> {ticker.detailed.raw.volatility_percent}%</div>
+                                </div>
+                                    <div className="prose prose-sm mt-2 max-w-none">
+                                        <ReactMarkdown>
+                                        {ticker.detailed.summary}
+                                        </ReactMarkdown>
+                                    </div>
+                                </div>
+
+                                    {/* Support & Resistance */}
+                                    <div>
+                                        <h4 className="font-semibold text-gray-700 mb-1">📈 Support & Resistance</h4>
+                                        <div className="grid grid-cols-2 gap-2">
+                                        <div><strong>Support:</strong> ${ticker.support_resistance.raw.support}</div>
+                                        <div><strong>Resistance:</strong> ${ticker.support_resistance.raw.resistance}</div>
+                                    </div>
+                                        <div className="prose prose-sm mt-2 max-w-none">
+                                            <ReactMarkdown>
+                                            {ticker.support_resistance.summary}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+                                </div>
+                                ))}
+                            </div>
+                            )
+            case 'analyze_sentiment':
+                    return (
+                        <div className="p-4  text-sm text-gray-800 space-y-4">
+                            {/* Summary Header */}
+                                <div className="flex items-center gap-2 font-bold text-red-500 text-lg">
+                                    <Gauge className="w-8 h-8" />
+                                    Market Sentiment Summary
+                                </div>
+                    
+                                <p>
+                                    <strong>Overall Sentiment:</strong> {response.general_sentiment} |{' '}
+                                    <strong>Avg. Confidence:</strong> {response.average_confidence.toFixed(1)}/10
+                                </p>
+                              
+                                {/* Summary markdown */}
+                                <div className="prose prose-sm max-w-none mb-4">
+                                    <ReactMarkdown>
+                                        {response.summary}
+                                    </ReactMarkdown>
+                                </div>
+                              
+                                {/* Articles */}
+                                <div className="space-y-4">
+                                    {response.articles.map((article: any, idx: number) => (
+                                        <div
+                                            key={idx}
+                                            className="border rounded-lg p-4 bg-gray-50 shadow-sm space-y-1"
+                                        >
+                                            <a
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-black text-lg font-bold hover:underline flex gap-2 items-center"
+                                            >
+                                                <Newspaper className="w-8 h-8" />
+                                                {article.title}
+                                            </a>
+
+                                        <div className="flex gap-4 text-sm text-black mt-4">
+                                            <span>
+                                                <strong>Sentiment:</strong> {article.sentiment}
+                                            </span>
+                                            <span>
+                                                <strong>Confidence:</strong> {article.confidence}/10
+                                            </span>
+                                        </div>
+                              
+                                        {/* Key Insights */}
+                                        <ul className="list-disc list-inside mt-2 text-md  text-black">
+                                            {article.key_insights
+                                                .split('\n')
+                                                .filter((line: string) => line.trim().startsWith('-'))
+                                                .map((line: string, i: number) => (
+                                                    <li key={i}>{line.replace('- ', '').trim()}</li>
+                                            ))}
+                                        </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                                </div>
+                            )
+        case 'crew_stock_summary':
+            return(
+                    <div className="space-y-4">
+                    <div className="p-4 text-sm text-gray-800">
+                    {/* Summary section */}
+                    <div className="flex items-center gap-2 font-bold text-black mb-2">
+                        <StickyNote className="w-8 h-8" />
+                        AI Analyst Summary: {response.market_data?.symbol}
+                    </div>
+            
+                    <div className="prose prose-sm max-w-none mb-4">
+                        <ReactMarkdown>
+                            {response.summary}
+                        </ReactMarkdown>
+                    </div>
+            
+                    {/* Chart */}
+                    {response.market_data?.historical_data && (
+                    <HistoricalChart
+                        data={response.market_data.historical_data.map((d: any) => ({
+                        date: d.date,
+                        close: d.close,
+                        }))}
+                    />
+                    )}
+                </div>
+                </div>
+            )
         case 'crew_buy_sell':
             return (
                 <div className="space-y-4">
@@ -74,7 +353,7 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                     ))}
                 </div>
                 )
-          
+
     // you can add other actions here like analyze_trend, full_analysis etc.
     default:
         return <div className="text-left">🤖 Unknown response type.</div>
