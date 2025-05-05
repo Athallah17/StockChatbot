@@ -3,6 +3,7 @@ import { Message } from '@/types/chat'
 import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import HistoricalChart from './Chart'
+import { getSentimentBadge, ConfidenceBar } from './UtilityHelper'
 
 export function ChatMessageRenderer({ message }: { message: Message }) {
   if (message.sender === 'user') {
@@ -257,13 +258,14 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                                                 {article.title}
                                             </a>
 
-                                        <div className="flex gap-4 text-sm text-black mt-4">
-                                            <span>
-                                                <strong>Sentiment:</strong> {article.sentiment}
-                                            </span>
-                                            <span>
-                                                <strong>Confidence:</strong> {article.confidence}/10
-                                            </span>
+                                        <div className="flex items-center justify-between text-md  text-black">
+                                        <div className="flex items-center gap-2">
+                                            <strong>Sentiment:</strong> {getSentimentBadge(article.sentiment)}
+                                        </div>
+                                        <div className="w-32">
+                                            <p className="text-xs text-gray-500">Confidence: {article.confidence}/10</p>
+                                            <ConfidenceBar value={article.confidence} />
+                                        </div>
                                         </div>
                               
                                         {/* Key Insights */}
