@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.model import call_finetuned_model
+from app.models.model import call_finetuned_model
 import httpx
 
 router = APIRouter()
