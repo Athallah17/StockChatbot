@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import market, analyzer, crew_analyst, crew_buysell, ask_chatbot, news ,sentiment
+from .routes import market, analyzer, crew_analyst, crew_buysell, ask_chatbot, news ,sentiment, indicators, predicitons
 
 app = FastAPI(title="Stock Chatbot API")
 
@@ -20,7 +20,8 @@ app.include_router(crew_buysell.router,prefix="/api")
 app.include_router(ask_chatbot.router,prefix="/api")
 app.include_router(news.router,prefix="/api")
 app.include_router(sentiment.router,prefix="/api")
-
+app.include_router(indicators.router,prefix="/api")
+app.include_router(predicitons.router,prefix="/api")
 
 @app.get("/")
 def read_root():
