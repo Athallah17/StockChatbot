@@ -12,7 +12,7 @@ async def generate_summary(prompt: str, system_prompt: str = "You are a stock ma
                 { "role": "system", "content": system_prompt },
                 { "role": "user", "content": prompt }
             ],
-            max_tokens=250,
+            max_tokens=700,
             temperature=0.6
         )
         return response.choices[0].message.content.strip()
