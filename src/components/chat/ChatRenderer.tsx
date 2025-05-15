@@ -1,6 +1,6 @@
 // components/chat/ChatMessageRenderer.tsx
 import { Message } from '@/types/chat'
-import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper } from 'lucide-react'
+import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper,TrendingUp } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import HistoricalChart from './Chart'
 import { getSentimentBadge, ConfidenceBar } from './UtilityHelper'
@@ -220,7 +220,7 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                                 ))}
                             </div>
                             )
-            case 'analyze_sentiment':
+            case 'get_sentiment':
                     return (
                         <div className="p-4  text-sm text-gray-800 space-y-4">
                             {/* Summary Header */}
@@ -355,7 +355,82 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                     ))}
                 </div>
                 )
-
+                case 'get_predict_price': {
+                    const prediction = response[0]
+                    const priceDiff = prediction.predicted_price - prediction.indicators.Close
+                    const percentChange = ((priceDiff / prediction.indicators.Close) * 100).toFixed(2)
+                    const isPositive = priceDiff >= 0
+                    const changeColor = isPositive ? 'text-green-600' : 'text-red-600'
+                  
+                    const sentiment = prediction.sentiment.general_sentiment
+                    const confidence = prediction.sentiment.average_confidence
+                  
+                    const sentimentBadge = {
+                      Bullish: 'bg-green-100 text-green-800',
+                      Bearish: 'bg-red-100 text-red-800',
+                      Neutral: 'bg-gray-100 text-gray-700',
+                    }[sentiment] || 'bg-gray-100 text-gray-600'
+                  
+                    const sentimentPulse = {
+                      Bullish: 'bg-green-500',
+                      Bearish: 'bg-red-500',
+                      Neutral: 'bg-gray-400',
+                    }[sentiment] || 'bg-gray-400'
+                  
+                    return (
+                      <div className="p-4 space-y-4 text-sm text-gray-800">
+                        {/* Header */}
+                        <div className="flex items-center gap-2 font-bold text-lg text-indigo-700">
+                          <LineChart className="w-8 h-8" />
+                          Price Prediction for {prediction.ticker} ({prediction.n_days}-Day Horizon)
+                        </div>
+                  
+                        {/* Price Summary */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-gray-50 border rounded-xl p-4 space-y-1">
+                            <p><strong>Current Price:</strong> ${prediction.indicators.Close.toFixed(2)}</p>
+                            <p><strong>Predicted Price:</strong> ${prediction.predicted_price.toFixed(2)}</p>
+                            <p>
+                              <strong>Expected Change:</strong>{' '}
+                              <span className={`${changeColor} font-semibold`}>
+                                {isPositive ? '+' : '-'}${Math.abs(priceDiff).toFixed(2)} ({Math.abs(percentChange)}%)
+                              </span>
+                            </p>
+                          </div>
+                  
+                          {/* Sentiment + Confidence Visualization */}
+                          <div className="bg-white border rounded-xl p-4 shadow-sm">
+                            <p className="font-semibold mb-2">Market Sentiment</p>
+                            <div className="relative h-5 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`absolute left-0 top-0 h-full transition-all duration-700 ${sentimentPulse} animate-pulse`}
+                                style={{ width: `${confidence * 10}%`, opacity: 0.8 }}
+                              />
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-sm">
+                              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${sentimentBadge}`}>
+                                {sentiment}
+                              </span>
+                              <span className="text-gray-500">{confidence}/10 confidence</span>
+                            </div>
+                          </div>
+                        </div>
+                  
+                        {/* Reasoning Summary */}
+                        <div className="pt-2 border-t mt-4">
+                          <div className="flex items-center gap-2 mb-2 text-indigo-700 font-bold text-lg">
+                            <TrendingUp className="w-8 h-8" />
+                            AI-Generated Reasoning
+                          </div>
+                            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-md font-medium">
+                                    <ReactMarkdown>
+                                        {prediction.reasoning}
+                                    </ReactMarkdown>
+                            </div>
+                        </div>
+                      </div>
+                    )
+                  }
     // you can add other actions here like analyze_trend, full_analysis etc.
     default:
         return <div className="text-left">🤖 Unknown response type.</div>
