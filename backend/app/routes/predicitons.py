@@ -36,28 +36,48 @@ async def predict_price(input: PredictInput) -> List[Dict[str, Any]]:
             sentiment_result = get_sentiment_for_topic(t)
 
             # 4. LLM-based reasoning
-            system_prompt = (
-                "You are a financial analyst that provides investment reasoning based on technical indicators, "
-                "predicted price, and market sentiment. Use Markdown to highlight main points like predicted price, "
-                "recommendation, and key indicators."
-            )
+            # Step 4: Format user prompt for LLM
+            technical_section = f"""
+Technical Summary:
+- RSI: {indicators.get("rsi", "N/A"):.2f}
+- MACD: {indicators.get("macd", "N/A"):.2f}
+- MACD Histogram: {indicators.get("macd_hist", "N/A"):.2f}
+- SMA10: {indicators.get("sma_10", "N/A"):.2f}
+- SMA20: {indicators.get("sma_20", "N/A"):.2f}
+- EMA10: {indicators.get("ema_10", "N/A"):.2f}
+- EMA20: {indicators.get("ema_20", "N/A"):.2f}
+"""
+
             user_prompt = f"""
-                Analyze the following stock prediction:
+You are analyzing the following stock prediction.
 
-                Ticker: {t}
-                Horizon: {input.n_days} days
-                Predicted Price: {predicted_price}
+- Ticker: {t}
+- Horizon: {input.n_days} days
+- Predicted Price: ${predicted_price:.2f}
+- Current Close Price: ${indicators.get("Close", "N/A"):.2f}
 
-                Technical Indicators:
-                {indicators}
+{technical_section}
 
-                Market Sentiment Summary:
-                {sentiment_result['summary']}
+Market Sentiment Summary:
+{sentiment_result['summary']}
 
-                Sentiment: {sentiment_result['general_sentiment']} (Confidence: {sentiment_result['average_confidence']:.2f})
+General Sentiment: {sentiment_result['general_sentiment']} (confidence: {sentiment_result['average_confidence']:.2f})
 
-                Provide an investment reasoning summary on whether the predicted price is favorable or not.
-                """
+Write a concise Markdown investment reasoning as a financial analyst. Avoid headings, long intros, or bullet overuse.
+"""
+
+            system_prompt = """
+You are a concise financial analyst. Based on technical indicators, predicted price, and sentiment,
+write a clean, readable investment reasoning in Markdown.
+
+Structure:
+- 2-3 paragraph summary
+- 2–3 bullet points max on key technicals
+- 1 paragraph disscusion for sentiment
+- 2-line recommendation
+
+Avoid overuse of headings, repetition, or robotic formatting.
+"""
 
             reasoning = await generate_summary(user_prompt, system_prompt)
 
