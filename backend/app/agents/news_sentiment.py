@@ -31,12 +31,12 @@ class SentimentCacheEntry:
 # === GPT Query ===
 def send_query(input_text: str, context: str) -> str:
     completion = client.chat.completions.create(
-        model='gpt-4',
+        model='gpt-3.5-turbo',
         messages=[
             {"role": "system", "content": context},
             {"role": "user", "content": input_text}
         ],
-        temperature=0.7
+        temperature=0.2
     )
     return completion.choices[0].message.content.strip()
 
