@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Query, HTTPException
 import pandas as pd
 from pydantic import BaseModel
-from typing import Optional, Literal, Dict, Any
-from app.agents.indicator_agents import IndicatorAgent
+from typing import Optional, Literal, Dict, Any, List
+from app.agents.calculation_indicator_agents import IndicatorAgent
 
 router = APIRouter()
 agent=IndicatorAgent()
 
 class IndicatorRequest(BaseModel):
-    ticker: str
+    ticker: List[str]
     period: Optional[str] = "3mo"
     interval: Optional[str] = "1d"
     window: Optional[int] = None  # untuk indikator yang membutuhkan window
