@@ -1,5 +1,5 @@
-// components/landing/WhoItsFor.tsx
 
+'use client'
 import { Briefcase, GraduationCap, LineChart, Search } from "lucide-react"
 
 const groups = [

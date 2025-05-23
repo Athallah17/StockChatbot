@@ -1,5 +1,5 @@
 // components/landing/Hero.tsx
-
+'use client'
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { Bot, User } from "lucide-react"

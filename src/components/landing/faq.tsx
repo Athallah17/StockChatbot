@@ -1,5 +1,4 @@
-// components/landing/Faq.tsx
-
+'use client'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 const faqs = [

@@ -1,5 +1,5 @@
 // components/landing/Showcase.tsx
-
+'use client'
 import { motion } from "framer-motion"
 import { Sparkles, Search, CheckCircle } from "lucide-react"
 

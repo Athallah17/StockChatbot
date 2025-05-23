@@ -1,35 +1,59 @@
 'use client'
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 
 const Navbar = () => {
-  return (
-    <header className="flex items-center justify-between px-8 py-6 bg-black">
-      <div className="text-2xl font-bold tracking-tight text-white">
-        📦 Stockers
-      </div>
+  const router = useRouter()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-      <nav className="flex items-center space-x-8 text-white text-lg font-semibold">
-        <Link href="/" className="hover:text-gray-300 transition-colors">
-          Home
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken")
+    const timestamp = sessionStorage.getItem("tokenTimestamp")
+    const isValid = token && timestamp && (Date.now() - parseInt(timestamp)) < 30 * 60 * 1000
+    setIsLoggedIn(!!isValid)
+  }, [])
+
+  const handleLogout = () => {
+    sessionStorage.clear()
+    setIsLoggedIn(false)
+    router.push("/auth/login")
+  }
+
+  return (
+    <header className="w-full border-b bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Brand */}
+        <Link href="/" className="text-xl font-extrabold text-black">
+          StockBot
         </Link>
-        <Link href="/features" className="hover:text-gray-300 transition-colors">
-          Features
-        </Link>
-        <Link href="/chatbots" className="hover:text-gray-300 transition-colors">
-          Chatbots
-        </Link>
-        <Link href="/contacts" className="hover:text-gray-300 transition-colors">
-          Contacts
-        </Link>
-        <Button
-          variant="outline"
-          className="ml-4 text-white border-white hover:bg-white hover:text-blue-600"
-        >
-          Sign up
-        </Button>
-      </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          {/* ✅ Always visible */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button asChild variant="default">
+              <Link href="/chatbots">Chatbot</Link>
+            </Button>
+          </motion.div>
+
+          {/* Conditionally show Login or Logout */}
+          {isLoggedIn ? (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" onClick={handleLogout}>Logout</Button>
+            </motion.div>
+          ) : (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button asChild variant="outline">
+                <Link href="/auth/login">Login / Sign Up</Link>
+              </Button>
+            </motion.div>
+          )}
+        </div>
+      </div>
     </header>
   )
 }

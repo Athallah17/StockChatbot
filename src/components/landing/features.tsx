@@ -1,4 +1,4 @@
-
+'use client';
 import { Card, CardContent } from "@/components/ui/card"
 import { BarChart3, Bot, Newspaper, Lightbulb } from "lucide-react"
 import { motion } from "framer-motion"
