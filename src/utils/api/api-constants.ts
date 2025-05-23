@@ -20,6 +20,7 @@ export const API_URLS = {
 
   // === CHATBOT ROUTES ===
   CHATBOT: '/ask',
+  HISTORY: '/chat/history',
 
   // === AUTH ROUTES ===
   LOGIN: '/auth/login',
