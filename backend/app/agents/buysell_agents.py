@@ -25,6 +25,7 @@ class BuySellAgent:
         return (
             f"{metrics_section}\n"
             f"{sentiment_section}\n"
-            f"Based on both the technical metrics and recent news sentiment above, provide a clear recommendation to BUY, SELL, or HOLD {ticker}. "
-            f"Explain your reasoning concisely and professionally."
+            f"Based on both the technical metrics and recent news sentiment above, provide a clear recommendation to BUY, SELL, or HOLD {ticker} point out this action with markdown format. "
+            f"Explain your reasoning concisely and professionally. Answer in compact 2-3 paragraphs give information like profesionals and use markdown format. "
+            f"Do not include any unnecessary information or disclaimers. "
         )

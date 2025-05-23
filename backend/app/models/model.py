@@ -13,7 +13,9 @@ def call_finetuned_model(message: str, model_id: str = "ft:gpt-3.5-turbo-0125:pe
     system_prompt = (
         "You are an intent and payload extractor for a stock market assistant.\n"
         "Given a user's question, return a JSON object with two keys:\n"
-        "- \"action\": the name of the action to perform (e.g., \"get_sentiment\", \"get_predict_price\", \"get_calculate_indicators\")\n"
+        "- \"action\": the name of the action to perform (e.g., \"get_live_price\", \"get_historical_data\", \"get_financials\", "
+        "\"get_sector_data\", \"get_dividends\", \"analyze_trend\", \"analyze_full\", \"crew_stock_summary\", \"crew_buy_sell\", "
+        "\"get_sentiment\", \"get_calcucate_indicators\", \"get_predict_price\", \"get_charts\")\n"
         "- \"payload\": a dictionary of parameters required for that action (e.g., \"tickers\", \"period\", \"interval\", \"n_days\")\n\n"
         "Use only valid Yahoo Finance tickers. Match the time expression in the question to the appropriate \"period\" and \"n_days\" values always use \"n_days\" when action is \"get_predict_price\".\n\n"
         "Your output must be in this exact JSON format:\n"

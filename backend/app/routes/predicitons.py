@@ -15,6 +15,12 @@ class PredictInput(BaseModel):
     n_days: int
     period: Optional[str] = "3mo"
     interval: Optional[str] = "1d"
+    
+def safe_fmt(value):
+    try:
+        return f"{float(value):.2f}"
+    except:
+        return "N/A"
 
 @router.post("/analyzer/predict")
 async def predict_price(input: PredictInput) -> List[Dict[str, Any]]:
@@ -23,36 +29,35 @@ async def predict_price(input: PredictInput) -> List[Dict[str, Any]]:
     for t in input.tickers:
         try:
             # 1. Fetch and compute indicators
-            df = indicator_agent.get_market_data(t, input.period, input.interval)
-            df = indicator_agent.calculate_all(df)
-            latest = indicator_agent.get_latest(df)
-            indicators = dict(latest)
-            indicators["n_days"] = input.n_days
+            features_df = indicator_agent.get_features_for_prediction(t, input.n_days)
+            features_dict = features_df.iloc[0].to_dict()
 
             # 2. Price prediction
-            predicted_price = prediction_agent.predict(indicators)
+            prediction_result = prediction_agent.predict(features_dict, input.n_days)
+            predicted_price = prediction_result["predicted_price"]
+            used_horizon = prediction_result["used_horizon"]
 
             # 3. Sentiment analysis
             sentiment_result = get_sentiment_for_topic(t)
 
             # 4. LLM-based reasoning
             # Step 4: Format user prompt for LLM
+            indicators = features_dict
             technical_section = f"""
 Technical Summary:
-- RSI: {indicators.get("rsi", "N/A"):.2f}
-- MACD: {indicators.get("macd", "N/A"):.2f}
-- MACD Histogram: {indicators.get("macd_hist", "N/A"):.2f}
-- SMA10: {indicators.get("sma_10", "N/A"):.2f}
-- SMA20: {indicators.get("sma_20", "N/A"):.2f}
-- EMA10: {indicators.get("ema_10", "N/A"):.2f}
-- EMA20: {indicators.get("ema_20", "N/A"):.2f}
+- RSI: {safe_fmt(indicators.get("rsi"))}
+- MACD: {safe_fmt(indicators.get("macd"))}
+- SMA10: {safe_fmt(indicators.get("sma_10"))}
+- SMA20: {safe_fmt(indicators.get("sma_20"))}
+- EMA10: {safe_fmt(indicators.get("ema_10"))}
+- EMA20: {safe_fmt(indicators.get("ema_20"))}
 """
 
             user_prompt = f"""
 You are analyzing the following stock prediction.
 
 - Ticker: {t}
-- Horizon: {input.n_days} days
+- Horizon: {input.n_days} days (using model: {used_horizon}d)
 - Predicted Price: ${predicted_price:.2f}
 - Current Close Price: ${indicators.get("Close", "N/A"):.2f}
 

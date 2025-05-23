@@ -82,3 +82,17 @@ class IndicatorAgent:
         if name not in self.indicators:
             raise ValueError(f"Indicator '{name}' is not supported.")
         return self.indicators[name](data, **kwargs)
+    
+    def get_features_for_prediction(self, ticker: str, n_days: int) -> pd.DataFrame:
+        df = self.get_market_data(ticker, period="3mo", interval="1d")
+        df = self.calculate_all(df)
+        df["return"] = df["Close"].pct_change().fillna(0)
+        df["lag_1"] = df["Close"].shift(1)
+        df["lag_2"] = df["Close"].shift(2)
+        df["n_days"] = n_days
+
+        latest = df.dropna().iloc[-1:]
+        return latest[[
+            "Close", "sma_10", "sma_20", "rsi", "macd", "obv",
+            "ema_10", "ema_20", "roc", "adx", "return", "lag_1", "lag_2", "n_days"
+        ]]
