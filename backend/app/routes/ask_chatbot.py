@@ -5,6 +5,9 @@ from pydantic import BaseModel
 from app.models.model import call_finetuned_model
 import httpx
 import traceback
+from auth.dependencies import get_current_user
+from db.models import User
+from fastapi import Depends
 
 router = APIRouter()
 
@@ -29,7 +32,7 @@ class AskRequest(BaseModel):
     message: str
 
 @router.post("/ask")
-async def ask_bot(request: AskRequest):
+async def ask_bot(request: AskRequest, user: User = Depends(get_current_user)):
     # Step 1: Use fine-tuned LLM to get action + payload
     result = call_finetuned_model(request.message)
 
