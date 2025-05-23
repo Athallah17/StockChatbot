@@ -340,7 +340,7 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                         <ReactMarkdown
                             components={{
                                 p: ({ node, ...props }) => (
-                                    <p className="prose prose-sm max-w-none" {...props} />
+                                    <p className="prose prose-sm max-w-none font-medium text-md" {...props} />
                                 ),
                             }}
                         >
