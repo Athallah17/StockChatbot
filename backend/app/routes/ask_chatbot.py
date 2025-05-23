@@ -1,17 +1,18 @@
-# app/routes/ask.py
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from app.models.model import call_finetuned_model
+from db.database import SessionLocal
+from db.model.user import User
+from db.model.chat import ChatSession, ChatMessage
+from auth.dependencies import get_current_user
+from db.database import get_db
 import httpx
 import traceback
-from auth.dependencies import get_current_user
-from db.models import User
-from fastapi import Depends
+from sqlalchemy.orm import Session
+from datetime import datetime
 
 router = APIRouter()
 
-# Action → API route map #terakhir ada apada buy-sell
 ACTION_ROUTE_MAP = {
     "get_live_price": "/api/market/prices",
     "get_historical_data": "/api/market/historical",
@@ -23,17 +24,23 @@ ACTION_ROUTE_MAP = {
     "crew_stock_summary": "/api/crew/stock-analysis",
     "crew_buy_sell": "/api/crew/buy-sell",
     "get_sentiment": "/api/news/sentiment",
-    "get_calcucate_indicators":"/api/indicators/all",
-    "get_predict_price":"/api/analyzer/predict",
+    "get_calcucate_indicators": "/api/indicators/all",
+    "get_predict_price": "/api/analyzer/predict",
     "get_charts": "/api/market/charts",
 }
+
+active_sessions = {}  # ⬅️ Simpan session_id per user sementara
 
 class AskRequest(BaseModel):
     message: str
 
 @router.post("/ask")
-async def ask_bot(request: AskRequest, user: User = Depends(get_current_user)):
-    # Step 1: Use fine-tuned LLM to get action + payload
+async def ask_bot(
+    request: AskRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Step 1: Gunakan model untuk klasifikasi
     result = call_finetuned_model(request.message)
 
     if "error" in result:
@@ -41,29 +48,52 @@ async def ask_bot(request: AskRequest, user: User = Depends(get_current_user)):
 
     action = result.get("action")
     payload = result.get("payload")
-    print('payload before:', payload)
-
     if not action or not payload:
-        raise HTTPException(status_code=422, detail="Model did not return valid action and payload")
+        raise HTTPException(status_code=422, detail="Invalid model output")
 
     route = ACTION_ROUTE_MAP.get(action)
-    print('route:', route)
     if not route:
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
-    # Step 2: Call mapped route with payload
-    timeout = httpx.Timeout(60.0)  # 60 seconds total timeout
+    # Step 2: Panggil endpoint analisis terkait
     try:
-        async with httpx.AsyncClient(base_url="http://localhost:8000",timeout=timeout) as client:
+        async with httpx.AsyncClient(base_url="http://localhost:8000", timeout=60.0) as client:
             response = await client.post(route, json=payload)
-            print('payload:', payload)
             response.raise_for_status()
             api_response = response.json()
     except Exception as e:
         tb = traceback.format_exc()
         raise HTTPException(status_code=500, detail=f"API call failed: {str(e)}\nTraceback:\n{tb}")
 
-    # Step 3: Return detailed response
+    # Step 3: Simpan ke DB (chat_sessions & chat_messages)
+    user_id = user.id
+    session_id = active_sessions.get(user_id)
+
+    # Buat session jika belum ada
+    if not session_id:
+        new_session = ChatSession(user_id=user_id, title=request.message, created_at=datetime.utcnow())
+        db.add(new_session)
+        db.commit()
+        db.refresh(new_session)
+        session_id = new_session.id
+        active_sessions[user_id] = session_id
+
+    # Simpan pesan user
+    db.add(ChatMessage(
+        session_id=session_id,
+        sender="user",
+        message=request.message
+    ))
+
+    # Simpan respon bot
+    db.add(ChatMessage(
+        session_id=session_id,
+        sender="bot",
+        message=str(api_response)
+    ))
+
+    db.commit()
+
     return {
         "action": action,
         "payload": payload,
