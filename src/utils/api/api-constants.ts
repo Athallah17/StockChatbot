@@ -20,5 +20,9 @@ export const API_URLS = {
 
   // === CHATBOT ROUTES ===
   CHATBOT: '/ask',
+
+  // === AUTH ROUTES ===
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
 };
 

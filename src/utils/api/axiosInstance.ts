@@ -12,4 +12,12 @@ const API_STOCKBOT = axios.create({
     },
 });
 
+//use interceptor to add token to every request
+API_STOCKBOT.interceptors.request.use((config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 export { API_STOCKBOT}
