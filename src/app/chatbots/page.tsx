@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useChatMutation } from '@/hooks/useChatMutation'
 import useAsk from '@/hooks/useAskChatbot'
 import { ChatMessages,ChatInput,ChatSidebar } from '@/components/chat'
+import { Navbar, Footer } from '@/components';
 
 const Chatbots= () => {
   const chatMutation = useChatMutation()

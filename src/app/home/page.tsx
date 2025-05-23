@@ -1,40 +1,46 @@
-import { Layout, Button, Row, Col, Typography,Image } from 'antd';
-import Link from 'next/link';
+'use client'
 
-import {Hero,Features,Showcase,Faq,WhoItsFor} from '@/components/landing'
-
-const { Content } = Layout;
-const { Title, Paragraph } = Typography;
+import { Navbar, Footer } from '@/components'
+import { Hero, Features, Showcase, Faq, WhoItsFor } from '@/components/landing'
 
 const Home = () => {
   return (
-    <Content className="scroll-smooth bg-white text-gray-900">
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-6">
-        <Hero />
-      </section>
+    <div className="flex flex-col min-h-screen bg-white text-gray-900 scroll-smooth">
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Features */}
-      <section className="py-20 bg-gray-50">
-        <Features />
-      </section>
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="min-h-screen flex items-center justify-center px-6">
+          <Hero />
+        </section>
 
-      {/* Showcase or How It Works */}
-      <section className="py-20 bg-white">
-        <Showcase />
-      </section>
+        {/* Features */}
+        <section className="py-20 bg-gray-50">
+          <Features />
+        </section>
 
-      {/* Who It's For */}
-      <section className="py-20 bg-gray-50">
-        <WhoItsFor />
-      </section>
+        {/* Showcase / How It Works */}
+        <section className="py-20 bg-white">
+          <Showcase />
+        </section>
 
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <Faq />
-      </section>
-    </Content>
+        {/* Who It's For */}
+        <section className="py-20 bg-gray-50">
+          <WhoItsFor />
+        </section>
+
+        {/* FAQ */}
+        <section className="py-20 bg-gray-50">
+          <Faq />
+        </section>
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
   )
 }
 
-export default Home;
+export default Home
