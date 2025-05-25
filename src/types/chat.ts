@@ -1,7 +1,7 @@
-export type Message = {
-    sender: 'user' | 'bot'
-    text: string | {
-      action: string
-      response: any
-    }
+export interface Message {
+  sender: 'user' | 'bot'
+  text: string | {
+    action: string
+    response: any
   }
+}

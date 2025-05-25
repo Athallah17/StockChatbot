@@ -5,9 +5,11 @@ import ReactMarkdown from 'react-markdown'
 import HistoricalChart from './Chart'
 import { getSentimentBadge, ConfidenceBar } from './UtilityHelper'
 
+
+
 export function ChatMessageRenderer({ message }: { message: Message }) {
   if (message.sender === 'user') {
-    return <div className="text-right">{message.text}</div>
+    return <div className="text-right text-white">{message.text}</div>
   }
 
   if (typeof message.text === 'string') {

@@ -4,6 +4,7 @@ import { MenuIcon, XIcon, Clock, Settings, ChevronDown, ChevronUp, Plus } from '
 import { useState, useRef, useEffect } from 'react'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ChatSession } from '@/utils/api/chat-history-api'
+import { useChatSession } from '@/context/ChatSessionContext'
 
 interface SidebarProps {
   initialOpen?: boolean
@@ -13,7 +14,7 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
   const [open, setOpen] = useState(initialOpen)
   const [historyOpen, setHistoryOpen] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
-
+  const { activeSessionId, setActiveSessionId, createNewSession } = useChatSession()
   const { sessions, isLoading, loadMore } = useChatHistory()
 
   useEffect(() => {
@@ -62,15 +63,18 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
 
           {/* Session list */}
           {open && historyOpen && (
-            <div className="pl-8 space-y-2">
-              <button className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300">
+            <div className="pl-4 flex-1 flex flex-col">
+              <button
+                onClick={createNewSession}
+                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 mb-2"
+              >
                 <Plus className="w-4 h-4" />
                 New Chat
               </button>
 
               <div
                 ref={scrollRef}
-                className="space-y-1 text-sm max-h-60 overflow-y-auto pr-2 scrollbar-thin"
+                className="flex-1 overflow-y-auto space-y-1 text-sm pr-1 scrollbar-thin"
               >
                 {isLoading && sessions.length === 0 ? (
                   <p className="text-gray-400">Loading...</p>
@@ -78,14 +82,19 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
                   sessions.map((session: ChatSession) => (
                     <div
                       key={session.session_id}
-                      className="hover:text-white text-gray-400 cursor-pointer truncate"
+                      onClick={() => setActiveSessionId(session.session_id)}
+                      className={`px-2 py-1 rounded cursor-pointer transition truncate
+                        ${session.session_id === activeSessionId
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        }`}
                     >
-                      • {session.title}
+                      {session.title}
                     </div>
                   ))
                 )}
                 {isLoading && sessions.length > 0 && (
-                  <p className="text-xs text-gray-500">Loading more...</p>
+                  <p className="text-xs text-gray-500 px-2">Loading more...</p>
                 )}
               </div>
             </div>

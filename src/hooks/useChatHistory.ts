@@ -17,10 +17,15 @@ export const useChatHistory = () => {
     });
 
     useEffect(() => {
-        if (data) {
-        setAllSessions((prev) => [...prev, ...data]);
-        }
-    }, [data]);
+    if (data) {
+        setAllSessions((prev) => {
+        const newSessions = data.filter(
+            (newSession) => !prev.some((s) => s.session_id === newSession.session_id)
+        )
+        return [...prev, ...newSessions]
+        })
+    }
+    }, [data])
 
     return {
         sessions: allSessions,
