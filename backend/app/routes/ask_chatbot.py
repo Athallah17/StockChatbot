@@ -6,6 +6,7 @@ from db.model.user import User
 from db.model.chat import ChatSession, ChatMessage
 from auth.dependencies import get_current_user
 from db.database import get_db
+import json
 import httpx
 import traceback
 from sqlalchemy.orm import Session
@@ -28,6 +29,7 @@ ACTION_ROUTE_MAP = {
     "get_predict_price": "/api/analyzer/predict",
     "get_charts": "/api/market/charts",
 }
+
 
 active_sessions = {}  # ⬅️ Simpan session_id per user sementara
 
@@ -85,11 +87,17 @@ async def ask_bot(
         message=request.message
     ))
 
+    bot_payload = {
+    "action": action,
+    "payload": payload,
+    "response": api_response
+}
+
     # Simpan respon bot
     db.add(ChatMessage(
         session_id=session_id,
         sender="bot",
-        message=str(api_response)
+        message=json.dumps(bot_payload)  # Simpan sebagai JSON string
     ))
 
     db.commit()
