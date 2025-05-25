@@ -67,18 +67,28 @@ async def ask_bot(
         tb = traceback.format_exc()
         raise HTTPException(status_code=500, detail=f"API call failed: {str(e)}\nTraceback:\n{tb}")
 
-    # Step 3: Simpan ke DB (chat_sessions & chat_messages)
+    # Step 3: Simpan ke DB
     user_id = user.id
     session_id = active_sessions.get(user_id)
 
     # Buat session jika belum ada
     if not session_id:
-        new_session = ChatSession(user_id=user_id, title=request.message, created_at=datetime.utcnow())
+        new_session = ChatSession(
+            user_id=user_id,
+            title="New Chat Session",
+            created_at=datetime.utcnow()
+        )
         db.add(new_session)
         db.commit()
         db.refresh(new_session)
         session_id = new_session.id
         active_sessions[user_id] = session_id
+
+    # ⬇️ Update title session jika masih default
+    session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+    if session and (not session.title or session.title == "New Chat Session"):
+        session.title = request.message
+        db.commit()
 
     # Simpan pesan user
     db.add(ChatMessage(
@@ -87,17 +97,17 @@ async def ask_bot(
         message=request.message
     ))
 
+    # Simpan respon bot dalam JSON
     bot_payload = {
-    "action": action,
-    "payload": payload,
-    "response": api_response
-}
+        "action": action,
+        "payload": payload,
+        "response": api_response
+    }
 
-    # Simpan respon bot
     db.add(ChatMessage(
         session_id=session_id,
         sender="bot",
-        message=json.dumps(bot_payload)  # Simpan sebagai JSON string
+        message=json.dumps(bot_payload)
     ))
 
     db.commit()
