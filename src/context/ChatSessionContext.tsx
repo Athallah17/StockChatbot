@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState } from 'react'
+import { API_STOCKBOT } from "@/utils/api/axiosInstance"
 
 interface ChatSessionContextProps {
   activeSessionId: string | null
@@ -15,13 +16,17 @@ const ChatSessionContext = createContext<ChatSessionContextProps | undefined>(un
 export const ChatSessionProvider = ({ children }: { children: React.ReactNode }) => {
     const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
     const [localMessages, setLocalMessages] = useState<{ sender: string; text: string }[]>([])
-    const createNewSession = () => {
-    const newId = crypto.randomUUID()
-    setActiveSessionId(newId)
-    setLocalMessages([
-        { sender: 'bot', text: '👋 Hello! Ask me anything about the stock market.' }
-    ])
-  }
+    const createNewSession = async () => {
+      try {
+        const res = await API_STOCKBOT.post("/chat/session/new")
+        setActiveSessionId(res.data.session_id)
+        setLocalMessages([
+          { sender: "bot", text: "👋 Hello! Ask me anything about the stock market." },
+        ])
+      } catch (err) {
+        console.error("Failed to create new session", err)
+      }
+    }
 
 return (
     <ChatSessionContext.Provider value={{
