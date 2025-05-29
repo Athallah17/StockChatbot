@@ -28,6 +28,7 @@ ACTION_ROUTE_MAP = {
     "get_calcucate_indicators": "/api/indicators/all",
     "get_predict_price": "/api/analyzer/predict",
     "get_charts": "/api/market/charts",
+    "general_information": "/api/general/info"
 }
 
 
