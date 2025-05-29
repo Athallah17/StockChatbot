@@ -2,6 +2,8 @@
 import { Message } from '@/types/chat'
 import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper,TrendingUp } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import HistoricalChart from './Chart'
 import { getSentimentBadge, ConfidenceBar } from './UtilityHelper'
 
@@ -433,6 +435,16 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                       </div>
                     )
                   }
+        case 'general_information':
+            return (
+                    <div className="w-full flex justify-start">
+                        <div className="max-w-2xl px-4 py-3 text-gray-800 text-md  prose prose-sm">
+                        <Markdown remarkPlugins={[remarkGfm]}>
+                            {response?.response || 'No information available.'}
+                        </Markdown>
+                        </div>
+                    </div>
+                    )
     // you can add other actions here like analyze_trend, full_analysis etc.
     default:
         return <div className="text-left">🤖 Unknown response type.</div>
