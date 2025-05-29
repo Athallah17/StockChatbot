@@ -1,16 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from app.models.model import call_finetuned_model
-from db.database import SessionLocal
-from db.model.user import User
-from db.model.chat import ChatSession, ChatMessage
-from auth.dependencies import get_current_user
-from db.database import get_db
-import json
-import httpx
-import traceback
 from sqlalchemy.orm import Session
 from datetime import datetime
+import json, httpx, traceback
+from app.models.model import call_finetuned_model_with_memory
+from app.models.memory import load_memory_from_db
+from db.model.user import User
+from db.model.chat import ChatSession, ChatMessage
+from db.database import get_db
+from auth.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -31,8 +29,7 @@ ACTION_ROUTE_MAP = {
     "general_information": "/api/general/info"
 }
 
-
-active_sessions = {}  # ⬅️ Simpan session_id per user sementara
+active_sessions = {}  # user_id -> session_id
 
 class AskRequest(BaseModel):
     message: str
@@ -43,8 +40,23 @@ async def ask_bot(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Step 1: Gunakan model untuk klasifikasi
-    result = call_finetuned_model(request.message)
+    user_id = user.id
+    session_id = active_sessions.get(user_id)
+
+    # Buat session baru jika belum ada
+    if not session_id:
+        new_session = ChatSession(user_id=user_id, title="New Chat Session", created_at=datetime.utcnow())
+        db.add(new_session)
+        db.commit()
+        db.refresh(new_session)
+        session_id = new_session.id
+        active_sessions[user_id] = session_id
+
+    # Load LangChain memory dari pesan-pesan terakhir
+    memory = load_memory_from_db(session_id, db)
+
+    # Gunakan LLM + memory untuk klasifikasi intent
+    result = await call_finetuned_model_with_memory(request.message, memory)
 
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
@@ -58,7 +70,7 @@ async def ask_bot(
     if not route:
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
-    # Step 2: Panggil endpoint analisis terkait
+    # Panggil endpoint sesuai action
     try:
         async with httpx.AsyncClient(base_url="http://localhost:8000", timeout=60.0) as client:
             response = await client.post(route, json=payload)
@@ -68,24 +80,7 @@ async def ask_bot(
         tb = traceback.format_exc()
         raise HTTPException(status_code=500, detail=f"API call failed: {str(e)}\nTraceback:\n{tb}")
 
-    # Step 3: Simpan ke DB
-    user_id = user.id
-    session_id = active_sessions.get(user_id)
-
-    # Buat session jika belum ada
-    if not session_id:
-        new_session = ChatSession(
-            user_id=user_id,
-            title="New Chat Session",
-            created_at=datetime.utcnow()
-        )
-        db.add(new_session)
-        db.commit()
-        db.refresh(new_session)
-        session_id = new_session.id
-        active_sessions[user_id] = session_id
-
-    # ⬇️ Update title session jika masih default
+    # Update judul session jika masih default
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if session and (not session.title or session.title == "New Chat Session"):
         session.title = request.message
@@ -98,7 +93,7 @@ async def ask_bot(
         message=request.message
     ))
 
-    # Simpan respon bot dalam JSON
+    # Simpan pesan bot (dalam format JSON)
     bot_payload = {
         "action": action,
         "payload": payload,

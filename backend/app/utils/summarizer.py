@@ -1,3 +1,7 @@
+from langchain.schema import HumanMessage
+from langchain_openai import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+
 from openai import AsyncOpenAI
 import os
 
@@ -18,3 +22,20 @@ async def generate_summary(prompt: str, system_prompt: str = "You are a stock ma
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"[LLM Error] {e}"
+
+# 🔽 NEW: Async function with LangChain memory
+async def generate_summary_with_memory(user_message: str, memory: ConversationBufferMemory) -> str:
+    try:
+        llm = ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0.6,
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            streaming=False,
+        )
+
+        messages = memory.chat_memory.messages + [HumanMessage(content=user_message)]
+        response = await llm.apredict_messages(messages)
+        return response.strip()
+
+    except Exception as e:
+        return f"[LLM Memory Error] {e}"
