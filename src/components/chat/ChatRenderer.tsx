@@ -1,6 +1,9 @@
 // components/chat/ChatMessageRenderer.tsx
 import { Message } from '@/types/chat'
-import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper,TrendingUp } from 'lucide-react'
+import { DollarSign, Brain, LineChart, BarChart3, Briefcase, PieChart, StickyNote, Gauge, Newspaper,TrendingUp,Tag,
+  TrendingDown, Info,
+  Package}
+from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -445,8 +448,83 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                         </div>
                     </div>
                     )
+        case 'get_top_tickers': {
+        const topCategory = response.category.toUpperCase() || 'TICKERS'
+        const data = response.response
+        const stocks = data?.stocks || []
+        const summary = data?.summary || ''
+
+            return (
+                <div className="space-y-4 p-4 ">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                    📋 Top {topCategory.replace('_', ' ')}
+                </h3>
+
+                {/* Stock Pills */}
+                <div className="flex flex-col gap-4">
+                    {stocks.map((ticker: any) => {
+                    const isUp = ticker.changePercent >= 0
+                    const ChangeIcon = isUp ? TrendingUp : TrendingDown
+
+                    return (
+                        <div
+                        key={ticker.symbol}
+                        className="flex items-center justify-between bg-gray-100 px-6 py-4 shadow-sm hover:shadow-md transition w-full"
+                        >
+                        {/* Left Info */}
+                        <div className="flex items-start gap-3 w-1/3">
+                            <Tag className="w-5 h-5 mt-1 text-gray-500" />
+                            <div>
+                            <span className="text-xl font-bold text-gray-900">{ticker.symbol}</span>
+                            <div className="text-sm text-gray-600">{ticker.shortName}</div>
+                            <div className="text-xs text-gray-400">{ticker.sector}</div>
+                            </div>
+                        </div>
+
+                        {/* Center Info */}
+                        <div className="flex items-center gap-2 w-1/3 justify-center">
+                            <DollarSign className="w-4 h-4 text-gray-500" />
+                            <p className="text-lg font-semibold text-gray-800">${ticker.price.toFixed(2)}</p>
+                            <ChangeIcon
+                            className={`w-4 h-4 ${isUp ? 'text-green-600' : 'text-red-600'}`}
+                            />
+                            <p className={`text-sm font-medium ${isUp ? 'text-green-600' : 'text-red-600'}`}>
+                            {isUp ? '+' : ''}
+                            {ticker.changePercent.toFixed(2)}%
+                            </p>
+                        </div>
+
+                        {/* Right Info */}
+                        <div className="flex items-center gap-2 w-1/3 justify-end">
+                            <Package className="w-4 h-4 text-gray-500" />
+                            <p className="text-md font-semibold text-gray-700">
+                            {ticker.volume.toLocaleString()}
+                            </p>
+                        </div>
+                        </div>
+                    )
+                    })}
+                </div>
+
+                {/* Summary */}
+                {summary && (
+                    <div className="p-4 bg-neutral-50 rounded-lg border border-dashed text-lg mt-4">
+                    <div className="flex items-center gap-2 mb-2 text-gray-700 font-bold">
+                        <Info className="w-4 h-4" />
+                        Summary
+                    </div>
+                    <div className="prose prose-sm text-gray-700 text-sm">
+                        <Markdown remarkPlugins={[remarkGfm]}>
+                            {summary}
+                        </Markdown>
+                    </div>
+                    </div>
+                )}
+                </div>
+            )
+        }
     // you can add other actions here like analyze_trend, full_analysis etc.
     default:
-        return <div className="text-left">🤖 Unknown response type.</div>
+        return <div className="text-left">Something went wrong. Please try again soon or try different questions.</div>
     }
 }
