@@ -1,10 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, Body
 from pydantic import BaseModel
-from typing import List
+from typing import List, Literal
 from app.agents.market_agents import MarketAgent
+from app.agents.top_ticker_agents import TopTickerAgent
 
 router = APIRouter()
 market_agent = MarketAgent()
+top_ticker_agent = TopTickerAgent()
 
 # === Request Models ===
 class MarketRequest(BaseModel):
@@ -68,3 +70,32 @@ async def get_full_market_report(request: FullReportRequest):
             "dividends_earnings": await market_agent.get_dividends_and_earnings(request.tickers)
         }
     }
+
+@router.post("/market/top-tickers")
+async def get_top_tickers_post(
+    payload: dict = Body(...)
+):
+    category = payload.get("category", "gainers")
+    limit = payload.get("limit", 5)
+
+    data = await top_ticker_agent.get_top_tickers(category, limit)
+    return {
+        "category": category,
+        "response": data
+    }
+
+@router.get("/market/top-tickers")
+async def get_top_tickers(
+    category: Literal["gainers", "losers", "most_active"] = "gainers",
+    limit: int = Query(5, ge=1, le=20)
+):
+    try:
+        data = await top_ticker_agent.get_top_tickers(category, limit)
+        return {
+            "category": category,
+            "response": data
+        }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }

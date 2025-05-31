@@ -26,7 +26,8 @@ ACTION_ROUTE_MAP = {
     "get_calcucate_indicators": "/api/indicators/all",
     "get_predict_price": "/api/analyzer/predict",
     "get_charts": "/api/market/charts",
-    "general_information": "/api/general/info"
+    "general_information": "/api/general/info",
+    "get_top_tickers": "/api/market/top-tickers",
 }
 
 active_sessions = {}  # user_id -> session_id
