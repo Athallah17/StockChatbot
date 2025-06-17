@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import useAsk from '@/hooks/useAskChatbot'
-import { ChatMessages, ChatInput, ChatSidebar } from '@/components/chat'
+import { ChatMessages, ChatInput, ChatSidebar, ChatHeaders } from '@/components/chat'
 import { useChatSession } from '@/context/ChatSessionContext'
 import { useChatMessages } from '@/hooks/useChatMessages'
 import { Navbar } from '@/components'
@@ -72,8 +72,9 @@ const Chatbots = () => {
         </div>
 
         {/* Chat Content */}
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <div className="max-w-3xl mx-auto space-y-4">
+        <div className="flex-1 overflow-y-auto px-2 py-4">
+          <ChatHeaders/>
+          <div className="max-w-3xl py-6 mx-auto space-y-4">
             <ChatMessages messages={messages} isLoading={isAsking} />
           </div>
         </div>

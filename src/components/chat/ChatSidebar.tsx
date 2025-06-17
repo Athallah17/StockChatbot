@@ -1,6 +1,8 @@
 'use client'
 
-import { MenuIcon, XIcon, Clock, Settings, ChevronDown, ChevronUp, Plus } from 'lucide-react'
+import {
+  MenuIcon, XIcon, Clock, Settings, ChevronDown, ChevronUp, Plus
+} from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ChatSession } from '@/utils/api/chat-history-api'
@@ -20,89 +22,114 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-
     const handleScroll = () => {
       if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
         loadMore()
       }
     }
-
     el.addEventListener("scroll", handleScroll)
     return () => el.removeEventListener("scroll", handleScroll)
   }, [loadMore])
 
   return (
     <aside
-      className={`h-full bg-gray-900 text-white transition-all duration-300 ease-in-out
-        ${open ? 'w-64' : 'w-20'} flex flex-col items-start py-6 px-4 shadow-md`}
+      className={`h-full bg-gray-900 text-white border-r transition-all duration-300 ease-in-out
+        ${open ? 'w-72' : 'w-20'} flex flex-col justify-between py-4 px-3 shadow-sm`}
     >
-      {/* Toggle Button */}
-      <div className="w-full flex justify-end mb-6">
-        <button
-          onClick={() => setOpen(!open)}
-          className="text-gray-300 hover:text-white transition"
-        >
-          {open ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
-        </button>
-      </div>
+      {/* Top section */}
+      <div className="w-full">
+        {/* Sidebar top buttons (Toggle + Title) */}
+        <div className="flex flex-col items-start w-full mb-4 px-1">
+          <button
+            onClick={() => setOpen(!open)}
+            className={`
+              mb-3 transition text-white
+              ${open
+                ? 'w-full flex justify-end pr-2'
+                : 'w-10 h-10 flex items-center justify-center rounded-full mx-auto'}
+            `}
+            title="Toggle Sidebar"
+          >
+            {open ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+          </button>
 
-      {/* Title */}
-      {open && <h1 className="text-xl font-semibold mb-8 tracking-tight">Market Chatbot</h1>}
-
-      {/* Nav */}
-      <nav className="space-y-4 w-full">
-        <div className="w-full">
-          <SidebarItem
-            icon={<Clock className="w-5 h-5" />}
-            label="History"
-            open={open}
-            expandable
-            expanded={historyOpen}
-            toggleExpand={() => setHistoryOpen(!historyOpen)}
-          />
-
-          {/* Session list */}
-          {open && historyOpen && (
-            <div className="pl-4 flex-1 flex flex-col">
-              <button
-                onClick={createNewSession}
-                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 mb-2"
-              >
-                <Plus className="w-4 h-4" />
-                New Chat
-              </button>
-
-              <div
-                ref={scrollRef}
-                className="flex-1 overflow-y-auto space-y-1 text-sm pr-1 scrollbar-thin"
-              >
-                {isLoading && sessions.length === 0 ? (
-                  <p className="text-gray-400">Loading...</p>
-                ) : (
-                  sessions.map((session: ChatSession) => (
-                    <div
-                      key={session.session_id}
-                      onClick={() => setActiveSessionId(session.session_id)}
-                      className={`px-2 py-1 rounded cursor-pointer transition truncate
-                        ${session.session_id === activeSessionId
-                          ? 'bg-gray-800 text-white'
-                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                        }`}
-                    >
-                      {session.title}
-                    </div>
-                  ))
-                )}
-                {isLoading && sessions.length > 0 && (
-                  <p className="text-xs text-gray-500 px-2">Loading more...</p>
-                )}
-              </div>
-            </div>
+          {open && (
+            <h1 className="text-lg font-semibold px-2 tracking-tight">
+              Market Chatbot (logo)
+            </h1>
           )}
         </div>
 
-        <SidebarItem icon={<Settings className="w-5 h-5" />} label="Settings" open={open} />
-      </nav>
+        {/* Navigation */}
+        <nav className="space-y-4 w-full">
+          {/* New Chat Button */}
+          <div className="w-full mt-4 px-1">
+            <button
+              onClick={createNewSession}
+              className={`
+                flex items-center justify-center gap-2 py-2 transition text-sm font-semibold
+                ${open
+                  ? 'w-full bg-blue-600 hover:bg-blue-500 text-white rounded-md'
+                  : 'w-10 h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-full mx-auto'}
+              `}
+              title="New Chat"
+            >
+              <Plus className="w-5 h-5" />
+              {open && 'New Chat'}
+            </button>
+          </div>
+          {/* History */}
+          <div className="w-full mt-4 px-1">
+            <SidebarItem
+              icon={<Clock className="w-6 h-6" />}
+              label="History"
+              open={open}
+              expandable
+              expanded={historyOpen}
+              toggleExpand={() => setHistoryOpen(!historyOpen)}
+            />
+
+            {open && historyOpen && (
+              <div className="pl-2 flex-1 flex flex-col">
+                <div
+                  ref={scrollRef}
+                  className="flex-1 overflow-y-auto space-y-1 text-sm pr-1 scrollbar-thin"
+                >
+                  {isLoading && sessions.length === 0 ? (
+                    <p className="text-gray-400 px-2">Loading...</p>
+                  ) : (
+                    sessions.map((session: ChatSession) => (
+                      <div
+                        key={session.session_id}
+                        onClick={() => setActiveSessionId(session.session_id)}
+                        className={`px-3 py-2 rounded-md cursor-pointer transition truncate font-light
+                          ${session.session_id === activeSessionId
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'text-white hover:bg-gray-700'
+                          }`}
+                      >
+                        {session.title}
+                      </div>
+                    ))
+                  )}
+                  {isLoading && sessions.length > 0 && (
+                    <p className="text-xs text-gray-400 px-3">Loading more...</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Settings */}
+          <div className="w-full mt-4 px-1">
+            <SidebarItem
+              icon={<Settings className="w-6 h-6" />}
+              label="Settings"
+              open={open}
+            />
+          </div>
+        </nav>
+      </div>
     </aside>
   )
 }
@@ -124,7 +151,7 @@ const SidebarItem = ({
 }) => {
   return (
     <div
-      className="flex items-center justify-between px-3 py-2 rounded-md cursor-pointer hover:bg-gray-800 transition text-sm"
+      className="flex items-center justify-between px-3 py-2 rounded-md cursor-pointer hover:bg-gray-700 transition text-sm text-white font-medium"
       onClick={toggleExpand}
     >
       <div className="flex items-center gap-3">

@@ -15,6 +15,7 @@ export const useChatMessages = (sessionId: string | null) => {
     queryFn: async () => {
       if (!sessionId) return []
       const res = await API_STOCKBOT.get(`${API_URLS.HISTORY}/${sessionId}`)
+      console.log('res:',res)
       const messages = res.data.messages || []
 
       return messages.map((msg: any) => {
