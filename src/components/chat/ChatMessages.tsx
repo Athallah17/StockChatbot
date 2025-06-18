@@ -1,11 +1,18 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { ChatMessageRenderer } from './ChatRenderer'
 import LoadingMessage from './Loading'
 import { Bot, User } from 'lucide-react'
 import { Message } from '@/types/chat'
 
 const ChatMessages = ({ messages, isLoading }: { messages: Message[]; isLoading: boolean }) => {
+  const bottomRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isLoading])
+
   return (
     <div className="space-y-4">
       {messages.map((msg, idx) => {
@@ -49,6 +56,7 @@ const ChatMessages = ({ messages, isLoading }: { messages: Message[]; isLoading:
         )
       })}
       {isLoading && <LoadingMessage />}
+      <div ref={bottomRef} />
     </div>
   )
 }
