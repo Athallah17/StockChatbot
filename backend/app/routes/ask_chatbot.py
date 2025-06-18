@@ -5,6 +5,7 @@ from datetime import datetime
 import json, httpx, traceback
 from app.models.model import call_finetuned_model_with_memory
 from app.models.memory import load_memory_from_db
+from app.utils.TitleGenerator import generate_chat_title
 from db.model.user import User
 from db.model.chat import ChatSession, ChatMessage
 from db.database import get_db
@@ -82,9 +83,10 @@ async def ask_bot(
         raise HTTPException(status_code=500, detail=f"API call failed: {str(e)}\nTraceback:\n{tb}")
 
     # Update judul session jika masih default
+    generated_title = await generate_chat_title(request.message)
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if session and (not session.title or session.title == "New Chat Session"):
-        session.title = request.message
+        session.title = generated_title
         db.commit()
 
     # Simpan pesan user
