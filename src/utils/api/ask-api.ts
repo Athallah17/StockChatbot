@@ -3,6 +3,7 @@ import { API_URLS } from "./api-constants";
 
 export interface AskRequest {
     message : string
+    session_id?: number
 }
 
 export interface AskResponse {

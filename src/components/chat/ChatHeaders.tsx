@@ -4,7 +4,6 @@ import { useChatSession } from '@/context/ChatSessionContext'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import {
   Star,
-  StarOff,
   Pencil,
   Trash
 } from 'lucide-react'
@@ -16,21 +15,27 @@ const ChatHeader = () => {
     const { sessions } = useChatHistory()
 
     const activeSession = sessions.find(session => session.session_id === activeSessionId)
-        const createdAt = activeSession?.created_at
-    const title = activeSession?.title || 'New Chat'
+    const createdAt = activeSession?.created_at
+    const title = activeSession?.title
+
     const [isFavorite, setIsFavorite] = useState(false)
 
     const handleRename = () => {
+        // implement rename logic
     }
 
     const handleDelete = () => {
+        // implement delete logic
     }
+
+    // Don't render until session is available and has a proper title
+    if (!title || title === 'New Chat Session') return null
 
 return (
     <header className="w-full px-4 py-3 border-b bg-white text-gray-800 flex justify-between items-center shadow-sm">
         <div className="flex flex-col max-w-[70%]">
             <span className="text-lg font-bold truncate flex items-center gap-2">
-                {title}
+            {title}
             </span>
             {createdAt && (
             <span className="text-sm px-6 py-2 text-gray-500 font-normal">
@@ -68,8 +73,8 @@ return (
             <Trash className="w-5 h-5 text-red-500" />
             </button>
         </div>
-        </header>
-    )
+    </header>
+  )
 }
 
 export default ChatHeader

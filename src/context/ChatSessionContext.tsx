@@ -20,9 +20,7 @@ export const ChatSessionProvider = ({ children }: { children: React.ReactNode })
       try {
         const res = await API_STOCKBOT.post("/chat/session/new")
         setActiveSessionId(res.data.session_id)
-        // setLocalMessages([
-        //   { sender: "bot", text: "👋 Hello! Ask me anything about the stock market." },
-        // ])
+        setLocalMessages([])
       } catch (err) {
         console.error("Failed to create new session", err)
       }

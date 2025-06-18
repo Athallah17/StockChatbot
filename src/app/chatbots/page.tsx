@@ -11,6 +11,7 @@ import {
 } from '@/components/chat'
 import { useChatSession } from '@/context/ChatSessionContext'
 import { useChatMessages } from '@/hooks/useChatMessages'
+import { useChatHistory } from '@/hooks/useChatHistory'
 import { Navbar } from '@/components'
 
 const Chatbots = () => {
@@ -24,7 +25,7 @@ const Chatbots = () => {
   } = useChatSession()
 
   const { data: sessionMessages = [], isLoading: isLoadingHistory } = useChatMessages(activeSessionId)
-
+  const { refetchHistory } = useChatHistory()
   const [input, setInput] = useState('')
   const messages = sessionMessages.length > 0 ? sessionMessages : localMessages
 
@@ -36,7 +37,10 @@ const Chatbots = () => {
     setLocalMessages((prev) => [...prev, newUserMessage])
 
     try {
-      const res = await askAsync({ message: textToSend })
+      const res = await askAsync({
+      message: textToSend,
+      session_id: activeSessionId ? Number(activeSessionId) : undefined
+    })
       console.log('Answer:', res)
 
       const botMsg = typeof res === 'string'
@@ -47,6 +51,7 @@ const Chatbots = () => {
           }
 
       setLocalMessages((prev) => [...prev, botMsg])
+      await refetchHistory()
     } catch {
       setLocalMessages((prev) => [
         ...prev,
@@ -77,7 +82,9 @@ const Chatbots = () => {
 
         {/* Chat Content */}
         <div className="flex-1 overflow-y-auto px-2 py-4">
-          <ChatHeaders />
+          <div className="sticky top-0 z-20 bg-white">
+              <ChatHeaders />
+          </div>
           <div className="max-w-3xl py-6 mx-auto space-y-4">
             {messages.length === 0 && !isAsking ? (
               <ChatStarter onPromptClick={handleSend} />
