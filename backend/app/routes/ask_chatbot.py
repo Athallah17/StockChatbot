@@ -35,6 +35,7 @@ active_sessions = {}  # user_id -> session_id
 
 class AskRequest(BaseModel):
     message: str
+    session_id: int | None = None  # ✅ optional override
 
 @router.post("/ask")
 async def ask_bot(
@@ -43,7 +44,7 @@ async def ask_bot(
     db: Session = Depends(get_db),
 ):
     user_id = user.id
-    session_id = active_sessions.get(user_id)
+    session_id = request.session_id or active_sessions.get(user_id)
 
     # Buat session baru jika belum ada
     if not session_id:

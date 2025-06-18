@@ -18,6 +18,8 @@ EXPIRATION_LENGTH = datetime.timedelta(days=2)
 client = OpenAI(api_key=OPENAI_API_KEY)
 NEWS_API_ENDPOINT = 'https://newsapi.org/v2/everything'
 
+print(f"Using NewsAPI Key: {repr(NEWS_API_KEY)}")
+
 @dataclass
 class SentimentCacheEntry:
     cached_time: datetime.datetime
