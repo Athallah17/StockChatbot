@@ -1,49 +1,151 @@
-// components/landing/Showcase.tsx
 'use client'
-import { motion } from "framer-motion"
-import { Sparkles, Search, CheckCircle } from "lucide-react"
+
+import { useState } from 'react'
+import { MessageSquare, Lightbulb, BarChart3, ChevronDown, ChevronUp } from 'lucide-react'
+import Image from 'next/image'
 
 const steps = [
   {
-    icon: <Search className="w-5 h-5 text-indigo-600" />,
-    title: "Ask a Question",
-    desc: "Type any stock question, like 'Should I buy AAPL today?'."
+    title: "Ask Anything",
+    icon: MessageSquare,
+    number: 1,
+    shortDesc: "Type your question about stocks, trends, or strategies. The chatbot understands both casual and technical terms.",
+    longDesc:
+      "Simply type in questions like 'Should I buy AAPL?' or 'Show me resistance levels for TSLA'. The chatbot understands both natural and financial language, making it easy for beginners and experienced traders alike.",
+    svg: "/svg/Chatbot-amico.svg",
   },
   {
-    icon: <Sparkles className="w-5 h-5 text-indigo-600" />,
-    title: "Let AI Analyze",
-    desc: "Our model pulls market data, news, and financials instantly."
+    title: "Get Instant Insights",
+    icon: Lightbulb,
+    number: 2,
+    shortDesc: "Real-time data is processed instantly using our AI. You’ll get actionable insights backed by indicators and sentiment.",
+    longDesc:
+      "Our system processes real-time data, technical indicators (like RSI, MACD), historical trends, and sentiment analysis from news sources to generate comprehensive but digestible answers—instantly.",
+    svg: "/svg/Chatbot-cuate.svg",
   },
   {
-    icon: <CheckCircle className="w-5 h-5 text-indigo-600" />,
-    title: "Get an Answer",
-    desc: "Receive a clear, concise recommendation with rationale."
+    title: "Make Smarter Decisions",
+    icon: BarChart3,
+    number: 3,
+    shortDesc: "Use the information to support your trades and investments, backed by AI-driven reasoning and risk factors.",
+    longDesc:
+      "With each response, our bot includes risk factors, market trends, and confidence ratings—helping you decide whether to hold, buy, or sell. This way, your decisions are never based on gut feeling alone.",
+    svg: "/svg/SiteStats-bro.svg",
   },
 ]
 
 const Showcase = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  const toggleOpen = (index: number) => {
+    setOpenIndex((prev) => (prev === index ? null : index))
+  }
+
   return (
-    <div id="showcase" className="max-w-5xl mx-auto px-6">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">How It Works</h2>
-        <p className="text-gray-600 mt-2">Ask anything. Get real answers. Instantly.</p>
+    <section className="relative w-full  py-24 lg:py-32" id="showcase">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Section header */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
+            How It Works
+          </h2>
+          <p className="mt-4 text-lg text-gray-100 max-w-2xl mx-auto">
+            Investing guidance—simplified. Here’s how you can go from question to insight in seconds.
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div className="space-y-12">
+          {steps.map((step, i) => {
+            const Icon = step.icon
+            const isEven = i % 2 === 0
+            const isOpen = openIndex === i
+
+            return (
+              <div
+                key={i}
+                className={`flex flex-col-reverse lg:flex-row ${!isEven ? 'lg:flex-row-reverse' : ''} items-center gap-6`}
+              >
+                {/* Left: Text */}
+                <div className='bg-white p-5 border-2 shadow-lg'>
+                  <div className="w-full lg:w-1/2 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm">
+                        {step.number}
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                        <Icon className="w-5 h-5 text-blue-600" />
+                        {step.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-600">{step.shortDesc}</p>
+                </div>
+
+                  {/* Toggleable Description */}
+                  <button
+                    onClick={() => toggleOpen(i)}
+                    className="text-sm text-blue-600 font-medium inline-flex items-center"
+                  >
+                    {isOpen ? (
+                      <>
+                        <ChevronUp className="w-4 h-4 mr-1" />
+                        Hide detailed explanation
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4 mr-1" />
+                        Read more
+                      </>
+                    )}
+                  </button>
+
+                  {isOpen && (
+                    <p className="mt-2 text-sm text-gray-700 bg-gray-50 border rounded-md p-4">
+                      {step.longDesc}
+                    </p>
+                  )}
+                </div>
+
+                {/* Right: Image */}
+                <div className="w-full lg:w-1/2">
+                  <div className="rounded-xl overflow-hidden">
+                      <object
+                        key={step.svg} // 👈 force remount when file changes
+                        type="image/svg+xml"
+                        data={step.svg}
+                        className="w-full h-auto floating"
+                        aria-label={step.title}
+                        role="img"
+                      />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Demo Video */}
+        <div className="mt-28">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-white">See It in Action</h3>
+            <p className="text-gray-100 mt-2">
+              Experience how our chatbot delivers intelligent stock market guidance—fast, simple, and human-like.
+            </p>
+          </div>
+          <div className="aspect-video rounded-xl overflow-hidden shadow-xl bg-black">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+              src="/videos/demo.mp4"
+            />
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-        {steps.map((step, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.2 }}
-            className="p-6 bg-white border rounded-xl shadow-sm text-center"
-          >
-            <div className="flex justify-center mb-3">{step.icon}</div>
-            <h3 className="text-lg font-semibold text-gray-800">{step.title}</h3>
-            <p className="text-sm text-gray-600 mt-1">{step.desc}</p>
-          </motion.div>
-        ))}
-      </div>
-    </div>
+    </section>
   )
 }
 

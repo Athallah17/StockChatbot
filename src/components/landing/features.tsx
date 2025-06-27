@@ -28,10 +28,10 @@ const features = [
 
 const Features = () => {
   return (
-    <div className="max-w-6xl mx-auto px-6">
+    <div className="relative max-w-6xl mx-auto px-6">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Features</h2>
-        <p className="text-gray-600 mt-2">Your financial co-pilot has you covered.</p>
+        <h2 className="text-3xl md:text-4xl font-bold text-white"> Smarter Tools. Better Results.</h2>
+        <p className="text-gray-100 mt-2"> Explore how we combine intelligence and simplicity to guide your financial journey.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {features.map((feat, idx) => (
@@ -44,8 +44,8 @@ const Features = () => {
             <Card className="p-6">
               <CardContent className="space-y-4">
                 {feat.icon}
-                <h3 className="text-lg font-semibold text-gray-800">{feat.title}</h3>
-                <p className="text-sm text-gray-600">{feat.description}</p>
+                <h3 className="text-lg font-black text-gray-800">{feat.title}</h3>
+                <p className="text-sm font-semibold text-gray-600">{feat.description}</p>
               </CardContent>
             </Card>
           </motion.div>

@@ -1,38 +1,32 @@
 'use client'
 
 import { Navbar, Footer } from '@/components'
-import { Hero, Features, Showcase, Faq, WhoItsFor } from '@/components/landing'
+import { Hero, Features, Showcase, Faq } from '@/components/landing'
 
 const Home = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-900 scroll-smooth">
+    <div className="relative flex flex-col min-h-screen text-gray-900 scroll-smooth overflow-hidden">
+      {/* Global Background Texture */}
+      <div className="fixed inset-0 z-[0] bg-[url('/svg/bank-note.svg')] bg-repeat opacity-10 pointer-events-none" />
+
       {/* Navbar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-6">
+      <main className="flex-1 bg-gradient-to-br from-teal-400 via-teal-700 to-cyan-900">
+        <section className="min-h-screen flex items-center justify-center">
           <Hero />
         </section>
 
-        {/* Features */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-12 z-10">
           <Features />
         </section>
 
-        {/* Showcase / How It Works */}
-        <section className="py-20 bg-white">
+        <section className="py-12 z-10">
           <Showcase />
         </section>
 
-        {/* Who It's For */}
-        <section className="py-20 bg-gray-50">
-          <WhoItsFor />
-        </section>
-
-        {/* FAQ */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-12 z-10">
           <Faq />
         </section>
       </main>

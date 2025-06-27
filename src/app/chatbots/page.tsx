@@ -24,7 +24,7 @@ const Chatbots = () => {
     createNewSession,
   } = useChatSession()
 
-  const { data: sessionMessages = [], isLoading: isLoadingHistory } = useChatMessages(activeSessionId)
+  const { data: sessionMessages = [],  } = useChatMessages(activeSessionId)
   const { refetchHistory } = useChatHistory()
   const [input, setInput] = useState('')
   const messages = sessionMessages.length > 0 ? sessionMessages : localMessages

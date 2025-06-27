@@ -1,50 +1,137 @@
 'use client'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-const faqs = [
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
+import {
+  MessageSquare,
+  Bot,
+  CheckCircle2,
+  BookOpen,
+  HelpCircle,
+  DollarSign,
+  Globe,
+  Timer,
+  ShieldCheck,
+  Users,
+  Activity
+} from 'lucide-react'
+
+const faqItems = [
   {
-    q: "Is this a real financial advisor?",
-    a: "No, this is an AI-powered tool that gives recommendations based on data, not personalized financial advice."
+    question: "How does StockBot help my investment strategy?",
+    answer: "StockBot uses AI to analyze indicators, trends, and sentiment to provide actionable investment insights.",
+    icon: Bot
   },
   {
-    q: "What data sources does it use?",
-    a: "We pull data from Yahoo Finance, NewsAPI, and sentiment analysis models."
+    question: "Is StockBot suitable for beginner investors?",
+    answer: "Yes, it understands plain English and gives clear, jargon-free answers ideal for new investors.",
+    icon: HelpCircle
   },
   {
-    q: "How often is the data updated?",
-    a: "Stock data and news are updated in real-time, based on market API responses."
+    question: "How accurate are the AI’s recommendations?",
+    answer: "While not guaranteed, recommendations are data-driven using predictive models and market sentiment.",
+    icon: CheckCircle2
   },
   {
-    q: "Can I get predictions for any stock?",
-    a: "Yes, as long as the stock is publicly listed and data is available."
+    question: "Do you support all stock tickers?",
+    answer: "We support most US-listed stocks and sectors. Global support is in development.",
+    icon: Globe
   },
   {
-    q: "Is my data stored or tracked?",
-    a: "No user data is permanently stored or tracked. All queries are stateless."
+    question: "Is there a free trial available?",
+    answer: "Yes! Try StockBot for free with limited queries before upgrading.",
+    icon: Timer
   },
   {
-    q: "Can this chatbot replace a financial advisor?",
-    a: "No. While helpful, the bot is meant to supplement your research — not replace licensed professionals."
+    question: "Can I use it for day trading?",
+    answer: "Yes. Our AI detects intraday trends and volatility indicators to assist day traders.",
+    icon: Activity
   },
   {
-    q: "What kind of recommendations does it give?",
-    a: "The AI provides trend-based analysis, buy/sell suggestions, and summaries based on financial indicators and market sentiment."
+    question: "Does StockBot work with crypto assets?",
+    answer: "Currently, we support only stock market tickers. Crypto support is coming soon.",
+    icon: DollarSign
+  },
+  {
+    question: "Can teams use StockBot collaboratively?",
+    answer: "Yes, team plans allow multiple users with shared access to saved analysis sessions.",
+    icon: Users
+  },
+  {
+    question: "Is my financial data secure?",
+    answer: "Absolutely. We use encryption and do not store personal trading or financial credentials.",
+    icon: ShieldCheck
+  },
+  {
+    question: "What devices is StockBot compatible with?",
+    answer: "You can access StockBot via mobile, tablet, and desktop browsers—no installation needed.",
+    icon: BookOpen
   }
 ]
 
 const Faq = () => {
   return (
-    <div className="max-w-3xl mx-auto px-6">
-      <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8">FAQ</h2>
-      <Accordion type="single" collapsible className="space-y-4">
-        {faqs.map((item, i) => (
-          <AccordionItem key={i} value={`item-${i}`}>
-            <AccordionTrigger>{item.q}</AccordionTrigger>
-            <AccordionContent>{item.a}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
+    <section className="relative w-full py-20" id="faq">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
+            Frequently Asked Questions
+          </h2>
+          <p className="mt-4 text-gray-100 text-lg max-w-2xl mx-auto">
+            We're here to answer your top questions. Still unsure? Reach out to us for more details.
+          </p>
+        </div>
+
+        {/* Grid layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Left: Illustration */}
+          <div className="flex justify-center items-center">
+            <object
+              data="/svg/robot-asking.svg"
+              type="image/svg+xml"
+              aria-label="Illustration of robot asking questions"
+              className="w-full max-w-md pointer-events-none"
+            >
+              <img
+                src="/svg/robot-asking.svg"
+                alt="Illustration of robot asking questions"
+                className="w-full max-w-md"
+              />
+            </object>
+          </div>
+
+          {/* Right: Accordion */}
+          <div className="space-y-6 bg-white p-4 rounded-lg">
+            {faqItems.map((faq, i) => {
+              const Icon = faq.icon
+              return (
+                <Accordion
+                  key={i}
+                  type="single"
+                  collapsible
+                  className="border border-gray-200 rounded-xl shadow-sm bg-white"
+                >
+                  <AccordionItem value={`faq-${i}`}>
+                    <AccordionTrigger className="text-left px-4 py-4 text-gray-900 font-medium flex items-center gap-3 text-base sm:text-lg">
+                      <Icon className="w-5 h-5 text-blue-600 shrink-0" />
+                      <span>{faq.question}</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 text-gray-700 text-sm sm:text-base">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 

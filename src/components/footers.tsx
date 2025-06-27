@@ -4,7 +4,7 @@ import Link from "next/link"
 
 const Footer = () => {
   return (
-    <footer className="bg-black border-t py-8 text-sm text-white">
+    <footer className="relative bg-white border-t py-8 text-sm text-black">
       <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between">
         <p>&copy; {new Date().getFullYear()} Stockers. All rights reserved.</p>
         <div className="space-x-4 mt-4 sm:mt-0">
