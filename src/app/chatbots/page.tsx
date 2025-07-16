@@ -27,7 +27,7 @@ const Chatbots = () => {
   const { data: sessionMessages = [],  } = useChatMessages(activeSessionId)
   const { refetchHistory } = useChatHistory()
   const [input, setInput] = useState('')
-  const messages = sessionMessages.length > 0 ? sessionMessages : localMessages
+  const messages = [...sessionMessages, ...localMessages]
 
   const handleSend = async (customText?: string) => {
     const textToSend = customText ?? input

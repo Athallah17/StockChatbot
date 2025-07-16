@@ -133,15 +133,16 @@ const Showcase = () => {
               Experience how our chatbot delivers intelligent stock market guidance—fast, simple, and human-like.
             </p>
           </div>
-          <div className="aspect-video rounded-xl overflow-hidden shadow-xl bg-black">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-              src="/videos/demo.mp4"
-            />
+
+          <div className="aspect-video rounded-xl overflow-hidden shadow-xl bg-black max-w-4xl mx-auto">
+            <iframe
+              src="https://www.youtube.com/embed/eGQrHNGL0lA"
+              title="Chatbot Demo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+              loading="lazy"
+            ></iframe>
           </div>
         </div>
       </div>

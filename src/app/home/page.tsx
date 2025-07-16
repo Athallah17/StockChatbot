@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div className="relative flex flex-col min-h-screen text-gray-900 scroll-smooth overflow-hidden">
       {/* Global Background Texture */}
-      <div className="fixed inset-0 z-[0] bg-[url('/svg/bank-note.svg')] bg-repeat opacity-10 pointer-events-none" />
+      <div className="fixed inset-0 z-[0] bg-[url('/svg/bank-note.svg')] bg-repeat opacity-3 pointer-events-none" />
 
       {/* Navbar */}
       <Navbar />

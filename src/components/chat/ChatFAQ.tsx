@@ -116,7 +116,7 @@ return (
                     className="min-w-[85%] sm:min-w-[45%] md:min-w-[30%] animate-fade-in"
                 >
                     <Card
-                    className="bg-white border hover:bg-gradient-to-br from-blue-500 to-gray-700 transition cursor-pointer h-full text-left group"
+                    className="bg-white border hover:bg-gradient-to-br from-teal-300 to-teal-700 transition cursor-pointer h-full text-left group"
                     onClick={() => onPromptClick(item.question)}
                     >
                         <CardContent className="p-5 flex flex-col gap-3 h-full justify-between">

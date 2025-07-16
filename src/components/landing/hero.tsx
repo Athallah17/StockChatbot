@@ -138,7 +138,7 @@ const Hero = () => {
           </div>
 
           {/* Chat Simulation */}
-          <div className="relative z-10 bg-white border border-gray-200 rounded-xl shadow-lg px-6 py-6 w-full">
+          <div className="relative z-10 bg-gray-200 border border-gray-200 rounded-xl shadow-lg px-6 py-6 w-full">
             <div className="space-y-6 text-base text-gray-800">
               {/* User Message */}
               <div className="flex justify-end items-start gap-2">

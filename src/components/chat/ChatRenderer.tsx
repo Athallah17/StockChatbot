@@ -107,7 +107,7 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                         {/* Metrics */}
                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                            <strong>P/E Ratio:</strong> {ticker.raw.PE_ratio.toFixed(2)}
+                            {/* <strong>P/E Ratio:</strong> {ticker.raw.PE_ratio.toFixed(2)} */}
                         </div>
                         <div>
                             <strong>EPS:</strong> {ticker.raw.EPS}
@@ -333,16 +333,35 @@ export function ChatMessageRenderer({ message }: { message: Message }) {
                             <div className="font-bold text-black">{item.ticker}</div>
                         </h3>
                         </div>
-            
+
                         {/* Metrics */}
                         <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                        <div><strong>Trend:</strong> {item.metrics.trend}</div>
-                        <div><strong>Growth %:</strong> {item.metrics.growth_pct}%</div>
-                        <div><strong>Support:</strong> {item.metrics.support}</div>
-                        <div><strong>Resistance:</strong> {item.metrics.resistance}</div>
-                        <div><strong>P/E Ratio:</strong> {item.metrics.PE_ratio.toFixed(2)}</div>
+                        <div>
+                            <strong>Trend:</strong>{" "}
+                            {item.metrics.trend ?? "N/A"}
                         </div>
-            
+                        <div>
+                            <strong>Growth %:</strong>{" "}
+                            {typeof item.metrics.growth_pct === "number"
+                            ? `${item.metrics.growth_pct}%`
+                            : "N/A"}
+                        </div>
+                        <div>
+                            <strong>Support:</strong>{" "}
+                            {item.metrics.support ?? "N/A"}
+                        </div>
+                        <div>
+                            <strong>Resistance:</strong>{" "}
+                            {item.metrics.resistance ?? "N/A"}
+                        </div>
+                        <div>
+                            <strong>P/E Ratio:</strong>{" "}
+                            {typeof item.metrics.PE_ratio === "number"
+                            ? item.metrics.PE_ratio.toFixed(2)
+                            : "N/A"}
+                        </div>
+                        </div>
+
                         {/* Markdown-based recommendation */}
                         <ReactMarkdown
                             components={{

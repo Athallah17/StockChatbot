@@ -16,7 +16,7 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
   const [open, setOpen] = useState(initialOpen)
   const [historyOpen, setHistoryOpen] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { activeSessionId, setActiveSessionId, createNewSession } = useChatSession()
+  const { activeSessionId, setActiveSessionId, createNewSession, setLocalMessages} = useChatSession()
   const { sessions, isLoading, loadMore } = useChatHistory()
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
 
   return (
     <aside
-      className={`h-full bg-gray-900 text-white border-r transition-all duration-300 ease-in-out
+      className={`h-full bg-teal-700 text-white border-r transition-all duration-300 ease-in-out
         ${open ? 'w-72' : 'w-20'} flex flex-col justify-between py-4 px-3 shadow-sm`}
     >
       {/* Top section */}
@@ -101,7 +101,10 @@ const ChatSidebar = ({ initialOpen = true }: SidebarProps) => {
                     sessions.map((session: ChatSession) => (
                       <div
                         key={session.session_id}
-                        onClick={() => setActiveSessionId(session.session_id)}
+                        onClick={() => {
+                          setLocalMessages([]); // 🧹 clear current messages immediately
+                          setActiveSessionId(session.session_id); // ✅ trigger session switch
+                        }}
                         className={`px-3 py-2 rounded-md cursor-pointer transition truncate font-light
                           ${session.session_id === activeSessionId
                             ? 'bg-blue-100 text-blue-800'
