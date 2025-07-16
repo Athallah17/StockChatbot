@@ -62,15 +62,18 @@ async def ask_bot(
     result = await call_finetuned_model_with_memory(request.message, memory)
 
     if "error" in result:
+        print("[Model Error]", result["error"])
         raise HTTPException(status_code=400, detail=result["error"])
 
     action = result.get("action")
     payload = result.get("payload")
     if not action or not payload:
+        print("[Invalid Model Output]", result)
         raise HTTPException(status_code=422, detail="Invalid model output")
 
     route = ACTION_ROUTE_MAP.get(action)
     if not route:
+        print("[Unknown Action]", action)
         raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
 
     # Panggil endpoint sesuai action

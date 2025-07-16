@@ -76,14 +76,34 @@ async def call_finetuned_model_with_memory(user_message: str, memory, model_id: 
     Calls the fine-tuned model using LangChain memory for contextual multi-turn classification.
     """
     try:
-        # Combine memory messages + new user message
         messages = memory.chat_memory.messages + [HumanMessage(content=user_message)]
 
         # Convert to OpenAI-style messages
         openai_messages = [{"role": "system", "content": system_prompt}]
+
         for msg in messages:
             role = "user" if msg.type == "human" else "assistant"
-            openai_messages.append({"role": role, "content": msg.content})
+
+            # Normalize content if it's a list
+            if isinstance(msg.content, list):
+                normalized_content = []
+                for item in msg.content:
+                    if isinstance(item, dict) and 'text' in item:
+                        # Patch in missing type
+                        normalized_content.append({
+                            "type": item.get("type", "text"),
+                            "text": item["text"]
+                        })
+                    else:
+                        # Fallback to plain string
+                        normalized_content.append({
+                            "type": "text",
+                            "text": str(item)
+                        })
+                openai_messages.append({"role": role, "content": normalized_content})
+            else:
+                # Regular string content
+                openai_messages.append({"role": role, "content": msg.content})
 
         response = await async_client.chat.completions.create(
             model=model_id,
@@ -95,5 +115,7 @@ async def call_finetuned_model_with_memory(user_message: str, memory, model_id: 
         print("[LLM MEMORY OUTPUT]", result)
 
         return json.loads(result)
+
     except Exception as e:
         return {"error": f"Failed to parse model output: {e}"}
+
