@@ -67,6 +67,7 @@ git clone https://github.com/yourusername/stockbot.git
 cd stockbot
 ```
 
+---
 ##2️⃣ Backend Setup
 ```bash
 cd backend
@@ -79,6 +80,7 @@ OPENAI_API_KEY=your_openai_api_key
 NEWS_API_KEY=your_newsapi_key
 DATABASE_URL=postgresql://user:password@localhost:5432/stockbot
 ```
+---
 ##3️⃣ Frontend Setup
 ```bash
 cd frontend
