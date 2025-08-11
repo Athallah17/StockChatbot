@@ -49,3 +49,40 @@
 - Optionally supports `pgvector` for semantic search
 
 ---
+
+# 🔮 How It Works
+
+1. **Ask Anything** – e.g., _"Should I buy AAPL?"_
+2. **LLM Understanding** – Routes request to correct agent.
+3. **Data Gathering** – Agents fetch market & sentiment data.
+4. **AI Reasoning** – LLM generates human-readable insight.
+5. **Response** – Sent back with charts, numbers, and summaries.
+# ⚙️ Installation
+
+---
+
+## 1️⃣ Clone Repository
+```bash 
+git clone https://github.com/yourusername/stockbot.git
+cd stockbot
+```
+
+##2️⃣ Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+```
+OPENAI_API_KEY=your_openai_api_key
+NEWS_API_KEY=your_newsapi_key
+DATABASE_URL=postgresql://user:password@localhost:5432/stockbot
+```
+##3️⃣ Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+---
